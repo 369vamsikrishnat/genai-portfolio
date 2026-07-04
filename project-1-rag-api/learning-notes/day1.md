@@ -57,21 +57,13 @@ We explored two distinct `sentence-transformers` models:
 -   **Task & Domain:** Some models perform better on specific tasks or domains.
 -   **Language Support:** Ensure the model is trained on your target language(s).
 
-### Resources
-- [Sentence Transformers Documentation](https://www.sbert.net/)
-- [BERT Models for Embeddings](https://huggingface.co/sentence-transformers)
-- [Understanding Cosine Similarity](https://en.wikipedia.org/wiki/Cosine_similarity)
-- [Euclidean Distance in Machine Learning](https://scikit-learn.org/stable/modules/metrics.pairwise.html)
+'King minus Man plus Woman equals Queen' in Vector Space: This analogy refers to the idea that in a well-trained word embedding space, semantic relationships between words can be captured as consistent geometric relationships (vectors). If you take the vector for 'king', subtract the vector for 'man', and then add the vector for 'woman', the resulting vector will be very close to the vector for 'queen'.
 
-### Reflection
-- Gained a solid understanding of how embeddings work and why they're crucial for RAG systems
-- Learned the differences between cosine similarity and Euclidean distance - cosine similarity is preferred for semantic search due to its focus on direction
-- Understanding the trade-off between model size/speed vs. accuracy is important for choosing the right embedding model
-- The similarity metrics learned here will be fundamental for implementing the retrieval component of RAG
+It works because:
 
-### Next Steps
-- [ ] Implement embedding generation using `sentence-transformers`
-- [ ] Test similarity calculations with sample sentences
-- [ ] Explore vector storage solutions (FAISS, Pinecone)
-- [ ] Benchmark different embedding models on sample data
-- [ ] Integrate embeddings into RAG pipeline
+The vector king can be thought of as (royal) + (male).
+The vector man can be thought of as (human) + (male).
+The vector woman can be thought of as (human) + (female).
+So, king - man essentially isolates the 'royalty' aspect and subtracts the 'male' aspect, potentially leaving a vector representing (royal - human). When you then add woman (which contains (human) + (female)), you get something like (royal - human) + (human + female) = (royal + female), which is semantically very close to 'queen'.
+
+This isn't an exact mathematical equation, but a demonstration that these models learn distributed representations where semantic properties are encoded in different directions or dimensions of the vector space.
