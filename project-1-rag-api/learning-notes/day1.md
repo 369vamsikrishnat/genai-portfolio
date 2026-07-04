@@ -57,7 +57,9 @@ We explored two distinct `sentence-transformers` models:
 -   **Task & Domain:** Some models perform better on specific tasks or domains.
 -   **Language Support:** Ensure the model is trained on your target language(s).
 
-'King minus Man plus Woman equals Queen' in Vector Space: This analogy refers to the idea that in a well-trained word embedding space, semantic relationships between words can be captured as consistent geometric relationships (vectors). If you take the vector for 'king', subtract the vector for 'man', and then add the vector for 'woman', the resulting vector will be very close to the vector for 'queen'.
+#### 'King minus Man plus Woman equals Queen' in Vector Space: 
+This analogy refers to the idea that in a well-trained word embedding space, semantic relationships between words can be captured as consistent geometric relationships (vectors). 
+If you take the vector for 'king', subtract the vector for 'man', and then add the vector for 'woman', the resulting vector will be very close to the vector for 'queen'.
 
 It works because:
 
