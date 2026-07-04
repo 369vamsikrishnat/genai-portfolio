@@ -220,12 +220,6 @@ for score, idx, text in sentence_distance_scores_mpnet:
 
 ---
 
-### Resources
-- [Sentence Transformers Documentation](https://www.sbert.net/)
-- [BERT Models for Embeddings](https://huggingface.co/sentence-transformers)
-- [Understanding Cosine Similarity](https://en.wikipedia.org/wiki/Cosine_similarity)
-- [Euclidean Distance in Machine Learning](https://scikit-learn.org/stable/modules/metrics.pairwise.html)
-
 ### Reflection
 - Gained a solid understanding of how embeddings work and why they're crucial for RAG systems
 - Learned the differences between cosine similarity and Euclidean distance - cosine similarity is preferred for semantic search due to its focus on direction
@@ -233,10 +227,4 @@ for score, idx, text in sentence_distance_scores_mpnet:
 - The similarity metrics learned here will be fundamental for implementing the retrieval component of RAG
 - Practical code examples help bridge theory and implementation
 
-### Next Steps
-- [ ] Implement embedding generation using `sentence-transformers`
-- [ ] Test similarity calculations with sample sentences
-- [ ] Explore vector storage solutions (FAISS, Pinecone)
-- [ ] Benchmark different embedding models on sample data
-- [ ] Integrate embeddings into RAG pipeline
-- [ ] Compare performance between MiniLM and MPNet models on your use case
+
