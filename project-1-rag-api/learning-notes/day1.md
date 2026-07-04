@@ -63,9 +63,10 @@ We explored two distinct `sentence-transformers` models:
 
 It works because:
 
--The vector king can be thought of as (royal) + (male).
--The vector man can be thought of as (human) + (male).
--The vector woman can be thought of as (human) + (female).
--So, king - man essentially isolates the 'royalty' aspect and subtracts the 'male' aspect, potentially leaving a vector representing (royal - human). When you then add woman (which contains (human) + (female)), you get something like (royal - human) + (human + female) = (royal + female), which is semantically very close to 'queen'.
+-  The vector king can be thought of as (royal) + (male).
+-  The vector man can be thought of as (human) + (male).
+-  The vector woman can be thought of as (human) + (female).
+-  So, king - man essentially isolates the 'royalty' aspect and subtracts the 'male' aspect, potentially leaving a vector representing (royal - human).
+When you then add woman (which contains (human) + (female)), you get something like (royal - human) + (human + female) = (royal + female), which is semantically very close to 'queen'.
 
 This isn't an exact mathematical equation, but a demonstration that these models learn distributed representations where semantic properties are encoded in different directions or dimensions of the vector space.
