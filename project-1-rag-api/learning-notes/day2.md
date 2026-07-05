@@ -383,9 +383,187 @@ If asked "Which chunking strategy would you choose?", a strong answer is:
 
 ---
 
+## Practical Implementation
+
+### Setup and Installation
+
+```python
+# Install necessary libraries
+!pip install pypdf langchain-text-splitters nltk
+
+# Download NLTK data for sentence splitting
+import nltk
+nltk.download('punkt')
+nltk.download('punkt_tab')
+
+# Import libraries for PDF extraction and text splitting
+from pypdf import PdfReader
+import io
+import os
+from langchain_text_splitters import RecursiveCharacterTextSplitter, NLTKTextSplitter
+```
+
+### Extract Text from PDF
+
+```python
+# Specify the path to your uploaded PDF file
+pdf_file_path = '/Vamsi_Krishna_T_Resume.pdf'
+
+# Check if the PDF file exists before proceeding
+if not os.path.exists(pdf_file_path):
+    raise FileNotFoundError(f"PDF file not found at: {pdf_file_path}. Please upload the file and ensure the name is correct.")
+
+# Function to extract text from the PDF
+def extract_text_from_pdf(pdf_path):
+    reader = PdfReader(pdf_path)
+    text = ""
+    for page in reader.pages:
+        text += page.extract_text() or ""
+    return text
+
+# Extract text from the PDF
+document_text = extract_text_from_pdf(pdf_file_path)
+
+# Provide feedback on text extraction
+if not document_text.strip():
+    print("Warning: The PDF seems to contain no extractable text. Please ensure it's not an image-only PDF.")
+else:
+    print(f"Successfully extracted text from '{pdf_file_path}'. Total characters: {len(document_text)}")
+    print("\n--- First 500 characters of extracted text ---")
+    print(document_text[:500])
+    print("------------------------------------------------")
+```
+
+### Strategy 1: Fixed-Size Chunking
+
+```python
+# Fixed-size chunks (500 chars, 50 overlap)
+# Using RecursiveCharacterTextSplitter with an empty string as a separator 
+# effectively forces fixed-size splitting at character level
+# Use when: You need strict, consistent chunk sizes, regardless of linguistic structure. 
+# Good for fixed-input models.
+
+fixed_size_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=500,
+    chunk_overlap=50,
+    length_function=len,
+    separators=[""],  # Force character-level splitting for strict fixed size
+    is_separator_regex=False,
+)
+fixed_size_chunks_combined = fixed_size_splitter.split_text(document_text)
+
+print(f"Fixed-size chunking produced {len(fixed_size_chunks_combined)} chunks.")
+print("\n--- First 5 Fixed-Size Chunks ---")
+for i, chunk in enumerate(fixed_size_chunks_combined[:5]):
+    print(f"Chunk {i+1} (Length: {len(chunk)} chars):\n{chunk}\n---\n")
+```
+
+### Strategy 2: Sentence-Based Chunking
+
+```python
+# Sentence-based chunking
+# NLTKTextSplitter inherently performs sentence-based splitting
+# Use when: You want to maintain semantic completeness within chunks, 
+# as sentences represent complete thoughts. Good for RAG where context is key.
+
+sentence_splitter_combined = NLTKTextSplitter()
+sentence_chunks_combined = sentence_splitter_combined.split_text(document_text)
+
+print(f"Sentence-based chunking produced {len(sentence_chunks_combined)} chunks.")
+print("\n--- First 5 Sentence-Based Chunks ---")
+for i, chunk in enumerate(sentence_chunks_combined[:5]):
+    print(f"Chunk {i+1} (Length: {len(chunk)} chars):\n{chunk}\n---\n")
+```
+
+### Strategy 3: Recursive Character Text Splitter (Hierarchical)
+
+```python
+# Recursive Character Text Splitter (200 chars, 20 overlap, with explicit hierarchical separators)
+# This strategy tries to split on a list of characters, in order, from longest to shortest.
+# It attempts to keep all paragraphs, then sentences, then words together as long as possible.
+# Use when: You need a flexible approach that prioritizes structural integrity 
+# (paragraphs, sentences) while still aiming for a target chunk size. 
+# Balances strict size with linguistic awareness.
+
+recursive_splitter_explicit_combined = RecursiveCharacterTextSplitter(
+    chunk_size=200,
+    chunk_overlap=20,
+    length_function=len,
+    separators=["\n\n", "\n", " ", ""],  # Explicitly define hierarchical separators
+    is_separator_regex=False,
+)
+recursive_chunks_combined = recursive_splitter_explicit_combined.split_text(document_text)
+
+print(f"RecursiveCharacterTextSplitter produced {len(recursive_chunks_combined)} chunks.")
+print("\n--- First 5 RecursiveCharacterTextSplitter Chunks ---")
+for i, chunk in enumerate(recursive_chunks_combined[:5]):
+    print(f"Chunk {i+1} (Length: {len(chunk)} chars):\n{chunk}\n---\n")
+```
+
+### Comparison Summary
+
+```python
+print("\n--- Combined Chunking Results Summary ---")
+print(f"Fixed-size chunking produced {len(fixed_size_chunks_combined)} chunks.")
+print(f"Sentence-based chunking produced {len(sentence_chunks_combined)} chunks.")
+print(f"RecursiveCharacterTextSplitter produced {len(recursive_chunks_combined)} chunks.")
+
+print("\n--- Analysis ---")
+print("Fixed-Size Chunks: Maintains consistent length (or close to it, given the overlap).")
+print("  Observation: Often cuts through words or sentences to meet the character count.")
+print("\nSentence-Based Chunks: Ends at sentence boundaries, leading to varying chunk lengths.")
+print("  Observation: Each chunk typically ends at a sentence boundary.")
+print("\nRecursiveCharacterTextSplitter: Splits based on hierarchical separators.")
+print("  Observation: Respects structural breaks like paragraphs and sentences.")
+```
+
+### Key Implementation Insights
+
+**Fixed-Size Chunking:**
+- Maintains uniform chunk sizes
+- May break words/sentences
+- Fast processing
+- Predictable output size
+
+**Sentence-Based Chunking:**
+- Respects sentence boundaries
+- Variable chunk sizes
+- Better semantic preservation
+- Good for natural language
+
+**Recursive Character Splitter:**
+- Balances size constraints with structure
+- Respects paragraph and sentence boundaries when possible
+- Falls back to word/character splitting if needed
+- Most versatile approach
+
+---
+
+### Resources
+- [LangChain Text Splitters Documentation](https://python.langchain.com/docs/how_to/character_text_splitters)
+- [Unstructured Library for PDF Processing](https://unstructured.io/)
+- [Semantic Chunking Research](https://arxiv.org/search/?query=semantic+chunking&searchtype=all)
+- [GPT-4 Vision API Documentation](https://platform.openai.com/docs/guides/vision)
+- [PyPDF Documentation](https://pypdf.readthedocs.io/)
+- [NLTK Tokenization](https://www.nltk.org/howto/tokenize.html)
+
 ### Reflection
 - Understood that "one-size-fits-all" chunking doesn't work for RAG systems
 - Learned that context preservation is critical for LLM performance
 - Realized that the choice of chunking strategy directly impacts retrieval accuracy
 - Recognized that semantic and agentic approaches represent the future of RAG systems
 - Understood the trade-offs between speed (Character/Recursive splitters) and quality (Semantic/Agentic)
+- Gained hands-on experience with practical implementation of different chunking strategies
+- Recognized that PDF extraction requires careful handling of text, tables, and images
+
+### Next Steps
+- [ ] Implement Recursive Character Text Splitter using LangChain on real documents
+- [ ] Test different chunk sizes and overlaps on sample documents
+- [ ] Implement Document-Specific Splitter for Python code
+- [ ] Experiment with Markdown and PDF splitting
+- [ ] Explore semantic chunking with embeddings
+- [ ] Benchmark chunking strategies against retrieval quality metrics
+- [ ] Learn about agentic chunking implementation
+- [ ] Test chunk size/overlap impact on retrieval performance
+- [ ] Handle images in PDFs using Vision LLMs
+- [ ] Create a comparison dashboard for different chunking strategies
