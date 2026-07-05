@@ -383,24 +383,9 @@ If asked "Which chunking strategy would you choose?", a strong answer is:
 
 ---
 
-### Resources
-- [LangChain Text Splitters Documentation](https://python.langchain.com/docs/how_to/character_text_splitters)
-- [Unstructured Library for PDF Processing](https://unstructured.io/)
-- [Semantic Chunking Research](https://arxiv.org/search/?query=semantic+chunking&searchtype=all)
-- [GPT-4 Vision API Documentation](https://platform.openai.com/docs/guides/vision)
-
 ### Reflection
 - Understood that "one-size-fits-all" chunking doesn't work for RAG systems
 - Learned that context preservation is critical for LLM performance
 - Realized that the choice of chunking strategy directly impacts retrieval accuracy
 - Recognized that semantic and agentic approaches represent the future of RAG systems
 - Understood the trade-offs between speed (Character/Recursive splitters) and quality (Semantic/Agentic)
-
-### Next Steps
-- [ ] Implement Recursive Character Text Splitter using LangChain
-- [ ] Test different chunk sizes and overlaps on sample documents
-- [ ] Implement Document-Specific Splitter for Python code
-- [ ] Experiment with Markdown and PDF splitting
-- [ ] Explore semantic chunking with embeddings
-- [ ] Benchmark chunking strategies against retrieval quality metrics
-- [ ] Learn about agentic chunking implementation
