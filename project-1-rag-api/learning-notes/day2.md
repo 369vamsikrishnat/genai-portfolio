@@ -539,13 +539,6 @@ print("  Observation: Respects structural breaks like paragraphs and sentences."
 
 ---
 
-### Resources
-- [LangChain Text Splitters Documentation](https://python.langchain.com/docs/how_to/character_text_splitters)
-- [Unstructured Library for PDF Processing](https://unstructured.io/)
-- [Semantic Chunking Research](https://arxiv.org/search/?query=semantic+chunking&searchtype=all)
-- [GPT-4 Vision API Documentation](https://platform.openai.com/docs/guides/vision)
-- [PyPDF Documentation](https://pypdf.readthedocs.io/)
-- [NLTK Tokenization](https://www.nltk.org/howto/tokenize.html)
 
 ### Reflection
 - Understood that "one-size-fits-all" chunking doesn't work for RAG systems
@@ -556,14 +549,3 @@ print("  Observation: Respects structural breaks like paragraphs and sentences."
 - Gained hands-on experience with practical implementation of different chunking strategies
 - Recognized that PDF extraction requires careful handling of text, tables, and images
 
-### Next Steps
-- [ ] Implement Recursive Character Text Splitter using LangChain on real documents
-- [ ] Test different chunk sizes and overlaps on sample documents
-- [ ] Implement Document-Specific Splitter for Python code
-- [ ] Experiment with Markdown and PDF splitting
-- [ ] Explore semantic chunking with embeddings
-- [ ] Benchmark chunking strategies against retrieval quality metrics
-- [ ] Learn about agentic chunking implementation
-- [ ] Test chunk size/overlap impact on retrieval performance
-- [ ] Handle images in PDFs using Vision LLMs
-- [ ] Create a comparison dashboard for different chunking strategies
