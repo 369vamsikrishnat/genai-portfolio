@@ -1,4 +1,4 @@
-# Day 3 - Introduction to LangChain
+# Day 3 -  LangChain
 
 ### Topic
 LangChain Framework: Building LLM-Powered Applications
