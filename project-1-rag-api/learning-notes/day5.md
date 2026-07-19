@@ -912,7 +912,3 @@ Vector Store
 
 (Output: Searchable Knowledge Base)
 ```
-
-> **Next (Day 6):**
->
-> We use this indexed knowledge base to build a complete RAG application using Retrievers, LCEL, RAG Chains, Streaming, Message History, and History-Aware Retrieval.
