@@ -6,7 +6,7 @@ A comprehensive portfolio showcasing projects and learning in Generative AI.
 
 ### 1. Foundations
 Retrieval-Augmented Generation API implementation.
-- **Location**: `project-1-rag-api/`
+- **Location**: `foundations/`
 - **Description**: [Add description]
 - **Technologies**: [Add tech stack]
 
