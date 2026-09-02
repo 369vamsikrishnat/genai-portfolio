@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     bm25 = build_bm25(chunks)
 
-    query = "what is covered"
+    query = "what is covered" #query = "Clause 4(b)"
 
     results = search_bm25(
         bm25,
