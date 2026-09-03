@@ -1,136 +1,243 @@
 from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
 import psycopg2
 
-# Models
-mini_model = SentenceTransformer("all-MiniLM-L6-v2")
-bge_model = SentenceTransformer("BAAI/bge-base-en-v1.5")
+from src.ingestion.chunker import section_aware_split
 
-# Model selected for PostgreSQL vector storage
+
+# --------------------------------------------------
+# BGE embedding model
+# --------------------------------------------------
+
 model = SentenceTransformer("BAAI/bge-base-en-v1.5")
 
-# Test sentences
-sentences = [
-    "Flood damage to the insured residential property is covered under this policy.",
-    "Fire damage caused by accidental ignition is covered subject to the policy limits.",
-    "The policyholder must report property damage within thirty days.",
-    "Water damage caused by a burst internal pipe may be covered.",
-    "Earthquake damage is excluded unless additional earthquake coverage was purchased.",
-    "The insurance policy covers theft of personal belongings after a documented burglary.",
-    "Storm-related damage to the roof is covered under the property protection section.",
-    "Flooding caused by external water sources is covered under the flood protection clause.",
-    "Premium payments must be made before the coverage renewal date.",
-    "Damage caused intentionally by the policyholder is not covered.",
-]
-
-# Query
-query = "Does the insurance policy cover damage caused by flooding?"
-
-# # --------------------------------------------------
-# # Hour 3 - MiniLM vs BGE experiment
-# # --------------------------------------------------
-
-# mini_embeddings = mini_model.encode(sentences)
-# mini_query_embedding = mini_model.encode(query)
-
-# bge_embeddings = bge_model.encode(sentences)
-# bge_query_embedding = bge_model.encode(query)
-
-# mini_scores = cosine_similarity(
-#     [mini_query_embedding],
-#     mini_embeddings
-# )[0]
-
-# bge_scores = cosine_similarity(
-#     [bge_query_embedding],
-#     bge_embeddings
-# )[0]
-
-# print("MiniLM embedding shape:", mini_embeddings.shape)
-# print("BGE embedding shape:", bge_embeddings.shape)
-
-# print("\nMiniLM ranking:")
-# for index in mini_scores.argsort()[::-1]:
-#     print(f"{mini_scores[index]:.4f} - {sentences[index]}")
-
-# print("\nBGE ranking:")
-# for index in bge_scores.argsort()[::-1]:
-#     print(f"{bge_scores[index]:.4f} - {sentences[index]}")
 
 # --------------------------------------------------
-# Hour 4 - Generate BGE embeddings for PostgreSQL
+# Database connection
 # --------------------------------------------------
 
-embeddings = model.encode(sentences)
+def get_connection():
+    return psycopg2.connect(
+        host="localhost",
+        port=5432,
+        database="policygraph",
+        user="postgres",
+        password="postgres"
+    )
 
-print("Database embeddings shape:", embeddings.shape)
-
-# Generate query embedding
-query_embedding = model.encode(query)
-
-query_vector = "[" + ",".join(
-    str(float(x)) for x in query_embedding
-) + "]"
-
-# --------------------------------------------------
-# Connect to PostgreSQL
-# --------------------------------------------------
-connection = psycopg2.connect(
-    host="localhost",
-    port=5432,
-    database="policygraph",
-    user="postgres",
-    password="postgres"
-)
-
-cursor = connection.cursor()
 
 # --------------------------------------------------
-# Store embeddings in PostgreSQL
+# Dense retrieval
 # --------------------------------------------------
-for sentence, embedding in zip(sentences, embeddings):
 
-    vector = "[" + ",".join(
-        str(float(x)) for x in embedding
+def dense_search(query, chunks, top_k=5):
+    """
+    Perform dense retrieval using BGE embeddings
+    and PostgreSQL pgvector.
+
+    Returns:
+        List of (chunk, similarity_score) tuples.
+    """
+
+    query_embedding = model.encode(query)
+
+    query_vector = "[" + ",".join(
+        str(float(x)) for x in query_embedding
     ) + "]"
+
+    connection = get_connection()
+    cursor = connection.cursor()
 
     cursor.execute(
         """
-        UPDATE document_chunks
-        SET embedding = %s
-        WHERE content = %s
+        SELECT
+            content,
+            1 - (embedding <=> %s::vector) AS similarity
+        FROM document_chunks
+        WHERE embedding IS NOT NULL
+        ORDER BY embedding <=> %s::vector
+        LIMIT %s;
         """,
-        (vector, sentence)
+        (
+            query_vector,
+            query_vector,
+            top_k
+        )
     )
 
-connection.commit()
+    rows = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    # Match database results back to the original chunks
+    chunk_lookup = {
+        chunk["content"]: chunk
+        for chunk in chunks
+    }
+
+    results = []
+
+    for content, similarity in rows:
+
+        if content in chunk_lookup:
+
+            results.append(
+                (
+                    chunk_lookup[content],
+                    float(similarity)
+                )
+            )
+
+    return results
+
 
 # --------------------------------------------------
-# Vector similarity search
+# Main - Dense retrieval test
 # --------------------------------------------------
 
-cursor.execute(
-    """
-    SELECT
-        id,
-        content,
-        1 - (embedding <=> %s::vector) AS similarity
-    FROM document_chunks
-    WHERE embedding IS NOT NULL
-    ORDER BY embedding <=> %s::vector
-    LIMIT 5;
-    """,
-    (query_vector, query_vector)
-)
+def main():
 
-rows = cursor.fetchall()
+    # --------------------------------------------------
+    # Load policy
+    # --------------------------------------------------
 
-print("\nTop 5 results:")
+    with open(
+        "data/synthetic_policies/policy_1.txt",
+        "r",
+        encoding="utf-8"
+    ) as file:
+        text = file.read()
 
-for row in rows:
-    print(f"{row[2]:.4f} - {row[1]}")
+    # --------------------------------------------------
+    # Create section-aware chunks
+    # --------------------------------------------------
+
+    chunks = section_aware_split(
+        text,
+        "policy_1.txt"
+    )
+
+    print(
+        "Number of chunks:",
+        len(chunks)
+    )
+
+    # --------------------------------------------------
+    # Generate BGE embeddings
+    # --------------------------------------------------
+
+    contents = [
+        chunk["content"]
+        for chunk in chunks
+    ]
+
+    embeddings = model.encode(contents)
+
+    print(
+        "Chunk embeddings shape:",
+        embeddings.shape
+    )
+
+    # --------------------------------------------------
+    # Store chunks + embeddings in PostgreSQL
+    # --------------------------------------------------
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    # Remove previous Day 1 test data
+    cursor.execute(
+        "DELETE FROM document_chunks"
+    )
+
+    # Insert actual section-aware chunks
+    for chunk, embedding in zip(
+        chunks,
+        embeddings
+    ):
+
+        vector = "[" + ",".join(
+            str(float(x))
+            for x in embedding
+        ) + "]"
+
+        cursor.execute(
+            """
+            INSERT INTO document_chunks
+            (
+                document_name,
+                section_number,
+                section_title,
+                page_number,
+                document_type,
+                content,
+                embedding
+            )
+            VALUES
+            (
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s
+            )
+            """,
+            (
+                "policy_1.txt",
+                chunk["section_number"],
+                chunk["section_title"],
+                chunk["page_number"],
+                "insurance",
+                chunk["content"],
+                vector
+            )
+        )
+
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+    print(
+        f"Stored {len(chunks)} chunks in PostgreSQL."
+    )
+
+    # --------------------------------------------------
+    # Test dense retrieval
+    # --------------------------------------------------
+
+    query = (
+        "Does the insurance policy cover "
+        "damage caused by flooding?"
+    )
+
+    results = dense_search(
+        query,
+        chunks,
+        top_k=5
+    )
+
+    print("\nTop 5 dense results:")
+
+    for rank, (chunk, score) in enumerate(
+        results,
+        start=1
+    ):
+
+        print(
+            f"\n{rank}. {score:.4f}"
+        )
+
+        print(
+            chunk["content"]
+        )
+
+
 # --------------------------------------------------
-# Close database connection
+# Run
 # --------------------------------------------------
-cursor.close()
-connection.close()
+
+if __name__ == "__main__":
+    main()
