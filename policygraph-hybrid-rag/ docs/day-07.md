@@ -286,5 +286,4 @@ dense = 7.0182 seconds
 ## Day 7 Status
 
 **COMPLETE**
-
 The project now has a working end-to-end RAG pipeline with per-step timing.
