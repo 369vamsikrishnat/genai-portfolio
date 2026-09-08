@@ -179,7 +179,7 @@ def run_pipeline(query):
 
 if __name__ == "__main__":
 
-    query = "What happens if property damage is intentional?"
+    query = "What is the coverage for flood damage?"
 
     answer, reranked_results, timings = run_pipeline(query)
 
