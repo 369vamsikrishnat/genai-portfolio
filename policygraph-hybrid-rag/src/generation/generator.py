@@ -52,7 +52,7 @@ def generate(question, documents, client):
         contents=prompt
     )
 
-    return response.text
+    return response.text, response.usage_metadata
 
 
 if __name__ == "__main__":

@@ -1,15 +1,74 @@
 services:
+
   postgres:
     image: pgvector/pgvector:pg17
     container_name: policygraph-postgres
+
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: policygraph
+
     ports:
       - "5432:5432"
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d policygraph"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: policygraph-api
+
+    environment:
+      API_KEY: ${API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL}
+
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/policygraph
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: policygraph-ui
+
+    command: >
+      python -m streamlit run src/ui/app.py
+      --server.address=0.0.0.0
+      --server.port=8501
+
+    environment:
+      API_URL: http://api:8000
+      API_KEY: ${API_KEY}
+
+    ports:
+      - "8501:8501"
+
+    depends_on:
+      - api
+
 
 volumes:
   postgres_data:

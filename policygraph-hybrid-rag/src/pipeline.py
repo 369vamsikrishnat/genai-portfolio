@@ -1,5 +1,5 @@
 import time
-
+from langfuse import observe
 from google import genai
 
 from src.ingestion.chunker import section_aware_split
@@ -21,11 +21,16 @@ from src.retrieval.reranker import (
 )
 
 from src.generation.generator import generate
+from src.api.cost_tracker import CostTracker
 
 
-def run_pipeline(query):
+@observe(name="policygraph-rag-pipeline")
+def run_pipeline(query, tracker=None):
 
     timings = {}
+
+    if tracker is None:
+       tracker = CostTracker()
 
     # --------------------------------------------------
     # Load policy
@@ -160,7 +165,7 @@ def run_pipeline(query):
 
     start = time.perf_counter()
 
-    answer = generate(
+    answer, usage_metadata = generate(
         question=query,
         documents=documents,
         client=client
@@ -170,7 +175,25 @@ def run_pipeline(query):
         time.perf_counter() - start
     )
 
-    return answer, reranked_results, timings
+    # --------------------------------------------------
+    # Record Gemini usage
+    # --------------------------------------------------
+
+    tracker.record(
+    input_tokens=usage_metadata.prompt_token_count,
+    output_tokens=usage_metadata.candidates_token_count,
+    thinking_tokens=usage_metadata.thoughts_token_count
+
+
+    )
+
+    return (
+        answer,
+        reranked_results,
+        timings,
+        usage_metadata,
+        tracker
+    )
 
 
 # --------------------------------------------------
@@ -181,7 +204,13 @@ if __name__ == "__main__":
 
     query = "What is the coverage for flood damage?"
 
-    answer, reranked_results, timings = run_pipeline(query)
+    (
+        answer,
+        reranked_results,
+        timings,
+        usage_metadata,
+        tracker
+    ) = run_pipeline(query)
 
     print("\n" + "=" * 80)
     print("QUERY")
@@ -218,3 +247,27 @@ if __name__ == "__main__":
         print(
             f"{step:<20} {duration:.4f} seconds"
         )
+
+    print("\n" + "=" * 80)
+    print("COST TRACKING")
+    print("=" * 80)
+
+    print(
+        f"Input tokens:       "
+        f"{tracker.total_input_tokens}"
+    )
+
+    print(
+        f"Output tokens:      "
+        f"{tracker.total_output_tokens}"
+    )
+
+    print(
+        f"Total cost:         "
+        f"${tracker.total_cost:.6f}"
+    )
+
+    print(
+        f"Average cost/query: "
+        f"${tracker.average_cost_per_query():.6f}"
+    )

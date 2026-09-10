@@ -1,3 +1,4 @@
+import os
 from sentence_transformers import SentenceTransformer
 import psycopg2
 
@@ -15,13 +16,13 @@ model = SentenceTransformer("BAAI/bge-base-en-v1.5")
 # Database connection
 # --------------------------------------------------
 
+
 def get_connection():
     return psycopg2.connect(
-        host="localhost",
-        port=5432,
-        database="policygraph",
-        user="postgres",
-        password="postgres"
+        os.getenv(
+            "DATABASE_URL",
+            "postgresql://postgres:postgres@localhost:5432/policygraph"
+        )
     )
 
 
