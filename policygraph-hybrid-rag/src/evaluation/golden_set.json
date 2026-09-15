@@ -1,0 +1,679 @@
+[
+  {
+    "id": 1,
+    "category": "clause_lookup",
+    "question": "What events are covered under Section I of the policy?",
+    "expected_answer": "Section I covers loss or damage to the insured vehicle caused by events including fire, explosion, self-ignition or lightning; burglary, housebreaking or theft; riot and strike; earthquake; flood, typhoon, hurricane, storm, tempest, inundation, cyclone, hailstorm; accidental external means; malicious act; terrorist activity; transit by road, rail, inland-waterway, lift, elevator or air; and landslide or rockslide.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "fire, explosion, self ignition or lightning",
+      "burglary, housebreaking or theft",
+      "riot and strike",
+      "earthquake",
+      "flood, typhoon, hurricane, storm, tempest",
+      "accidental external means",
+      "malicious act",
+      "terrorist activity",
+      "transit by road, rail, inland-waterway, lift, elevator or air",
+      "landslide or rockslide"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 2,
+    "category": "clause_lookup",
+    "question": "What depreciation applies to rubber, nylon, plastic parts, tyres, tubes, batteries and airbags?",
+    "expected_answer": "Depreciation is applied to rubber, nylon, plastic parts, tyres, tubes, batteries and airbags according to the policy's depreciation provisions.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "all rubber, nylon, plastic parts",
+      "tyres, tubes and batteries",
+      "air bags"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 3,
+    "category": "specific_value",
+    "question": "What depreciation applies to fibre glass?",
+    "expected_answer": "The depreciation applicable to fibre glass is 30%.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "fibre glass",
+      "30%"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 4,
+    "category": "specific_value",
+    "question": "What depreciation applies to glass?",
+    "expected_answer": "No depreciation is applied to glass.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "glass",
+      "No depreciation"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 5,
+    "category": "specific_value",
+    "question": "What depreciation applies to a vehicle exceeding 5 years but not exceeding 10 years?",
+    "expected_answer": "The applicable depreciation is 40%.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "exceeding 5 years",
+      "but not exceeding 10 years",
+      "40%"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 6,
+    "category": "clause_lookup",
+    "question": "What is the maximum amount payable for protection, removal and re-delivery of the vehicle?",
+    "expected_answer": "The maximum amount payable is Rs. 1,500.",
+    "source_section": "Section I, Clause 2",
+    "source_page": 2,
+    "relevant_evidence": [
+      "protection and removal to nearest repairer",
+      "re-delivery to the insured",
+      "maximum limit of Rs.1500"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 7,
+    "category": "specific_value",
+    "question": "What is the maximum repair authorization amount?",
+    "expected_answer": "The repair authorization limit is Rs. 500.",
+    "source_section": "Section I, Clause 3",
+    "source_page": 2,
+    "relevant_evidence": [
+      "repair authorization",
+      "Rs.500"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 8,
+    "category": "clause_lookup",
+    "question": "How is the Insured's Declared Value determined?",
+    "expected_answer": "The IDV is based on the manufacturer's listed selling price of the vehicle, adjusted according to the applicable depreciation schedule.",
+    "source_section": "Section I, Insured's Declared Value",
+    "source_page": 3,
+    "relevant_evidence": [
+      "Insured's Declared Value",
+      "IDV",
+      "manufacturer's listed selling price",
+      "depreciation"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 9,
+    "category": "specific_value",
+    "question": "When is a vehicle treated as a constructive total loss?",
+    "expected_answer": "A vehicle is treated as a constructive total loss when the cost of retrieval and/or repair exceeds 75% of the IDV.",
+    "source_section": "Section I, Insured's Declared Value",
+    "source_page": 3,
+    "relevant_evidence": [
+      "constructive total loss",
+      "exceeds 75% of the IDV"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 10,
+    "category": "clause_lookup",
+    "question": "What is the maximum compensation under the Personal Accident Cover for the Owner-Driver?",
+    "expected_answer": "The maximum compensation is Rs. 15 lakhs.",
+    "source_section": "Section III, Personal Accident Cover for Owner-Driver",
+    "source_page": 4,
+    "relevant_evidence": [
+      "Personal Accident Cover",
+      "Owner-Driver",
+      "maximum compensation of Rs.15 lakhs"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 11,
+    "category": "coverage_lookup",
+    "question": "Is damage caused by flood covered under the policy?",
+    "expected_answer": "Yes. Flood is included among the covered causes of loss or damage.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "flood",
+      "inundation"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 12,
+    "category": "coverage_lookup",
+    "question": "Is theft covered under the policy?",
+    "expected_answer": "Yes. Burglary, housebreaking or theft is covered.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "burglary, housebreaking or theft"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 13,
+    "category": "coverage_lookup",
+    "question": "Is accidental external damage covered?",
+    "expected_answer": "Yes. Loss or damage caused by accidental external means is covered.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "accidental external means"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 14,
+    "category": "third_party_liability",
+    "question": "Does the policy provide cover for bodily injury to a third party?",
+    "expected_answer": "Yes. The policy provides indemnity for death or bodily injury to a third party.",
+    "source_section": "Section II, Clause 1",
+    "source_page": 3,
+    "relevant_evidence": [
+      "death or bodily injury to any person"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 15,
+    "category": "third_party_liability",
+    "question": "Does the policy cover damage to third-party property?",
+    "expected_answer": "Yes, subject to the policy terms and applicable limits.",
+    "source_section": "Section II, Clause 1",
+    "source_page": 3,
+    "relevant_evidence": [
+      "damage to property"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 16,
+    "category": "personal_accident",
+    "question": "What percentage of the Personal Accident Cover is payable in case of death of the Owner-Driver?",
+    "expected_answer": "100% of the applicable compensation is payable.",
+    "source_section": "Section III, Personal Accident Cover",
+    "source_page": 4,
+    "relevant_evidence": [
+      "Death",
+      "100%",
+      "Owner-Driver"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 17,
+    "category": "personal_accident",
+    "question": "What percentage is payable for loss of one limb or one eye?",
+    "expected_answer": "50% of the applicable compensation is payable.",
+    "source_section": "Section III, Personal Accident Cover",
+    "source_page": 4,
+    "relevant_evidence": [
+      "one limb",
+      "one eye",
+      "50%"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 18,
+    "category": "edge_case",
+    "question": "What should the insured do in case of theft or a criminal act?",
+    "expected_answer": "The insured must give immediate notice to the police and cooperate with the Company in securing the conviction of the offender.",
+    "source_section": "Conditions, Clause 1",
+    "source_page": 7,
+    "relevant_evidence": [
+      "theft or criminal act",
+      "immediate notice to the police",
+      "cooperate with the Company",
+      "securing the conviction of the offender"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 19,
+    "category": "edge_case",
+    "question": "How are claims handled when only tyres or tubes are damaged?",
+    "expected_answer": "Damage to tyres or tubes is generally excluded unless the vehicle is damaged at the same time. Where applicable, the replacement cost is subject to 50% contribution.",
+    "source_section": "Section I, Clause 2",
+    "source_page": 2,
+    "relevant_evidence": [
+      "tyres or tubes",
+      "unless the vehicle is damaged at the same time",
+      "50% of the cost of replacement"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 20,
+    "category": "edge_case",
+    "question": "Who bears the risk of further damage if the vehicle is driven before necessary repairs?",
+    "expected_answer": "Any further damage caused by driving the vehicle before the necessary repairs is at the insured's risk.",
+    "source_section": "Conditions, Clause 4",
+    "source_page": 7,
+    "relevant_evidence": [
+      "driven before the necessary repairs",
+      "further damage",
+      "insured's risk"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 21,
+    "category": "clause_lookup",
+    "question": "What is the time limit mentioned for bringing a claim after a disclaimer?",
+    "expected_answer": "The relevant period is 12 months.",
+    "source_section": "Conditions, Clause 7",
+    "source_page": 8,
+    "relevant_evidence": [
+      "12 months",
+      "disclaimer",
+      "abandonment"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 22,
+    "category": "edge_case",
+    "question": "What happens to the policy if the sole insured dies?",
+    "expected_answer": "The policy remains in force for three months from the date of death or until its expiry, whichever is earlier.",
+    "source_section": "Conditions, Clause 9",
+    "source_page": 9,
+    "relevant_evidence": [
+      "sole insured",
+      "death",
+      "policy shall remain in force",
+      "three months",
+      "expiry"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 23,
+    "category": "trick",
+    "question": "How long does the insurer have to settle a claim?",
+    "expected_answer": "NOT_IN_DOCUMENTS",
+    "source_section": "No supporting provision in the supplied policy",
+    "source_page": null,
+    "relevant_evidence": [],
+    "expected_abstention": true
+  },
+  {
+    "id": 24,
+    "category": "trick",
+    "question": "What is the maximum age of a vehicle eligible for purchase of this policy?",
+    "expected_answer": "NOT_IN_DOCUMENTS",
+    "source_section": "No supporting provision in the supplied policy",
+    "source_page": null,
+    "relevant_evidence": [],
+    "expected_abstention": true
+  },
+  {
+    "id": 25,
+    "category": "trick",
+    "question": "Which network garages provide cashless repair facilities?",
+    "expected_answer": "NOT_IN_DOCUMENTS",
+    "source_section": "No supporting provision in the supplied policy",
+    "source_page": null,
+    "relevant_evidence": [],
+    "expected_abstention": true
+  },
+  {
+    "id": 26,
+    "category": "specific_value",
+    "question": "What depreciation applies to the material cost of painting?",
+    "expected_answer": "The applicable depreciation is 50% of the material cost.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "painting",
+      "50%",
+      "material cost"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 27,
+    "category": "specific_value",
+    "question": "What percentage of the painting cost is treated as the material component when a consolidated painting charge is used?",
+    "expected_answer": "The material component is taken as 25%.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "painting",
+      "material component",
+      "25%"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 28,
+    "category": "specific_value",
+    "question": "What depreciation applies to a vehicle older than 10 years?",
+    "expected_answer": "The applicable depreciation is 50%.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "exceeding 10 years",
+      "50%"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 29,
+    "category": "specific_value",
+    "question": "What depreciation applies to a vehicle exceeding 4 years but not exceeding 5 years?",
+    "expected_answer": "The applicable depreciation is 35%.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "exceeding 4 years",
+      "but not exceeding 5 years",
+      "35%"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 30,
+    "category": "specific_value",
+    "question": "What depreciation applies to a vehicle exceeding 3 years but not exceeding 4 years?",
+    "expected_answer": "The applicable depreciation is 40%.",
+    "source_section": "Insured's Declared Value",
+    "source_page": 3,
+    "relevant_evidence": [
+      "exceeding 3 years",
+      "but not exceeding 4 years",
+      "40%"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 31,
+    "category": "edge_case",
+    "question": "How is IDV determined for a vehicle older than 5 years?",
+    "expected_answer": "For vehicles beyond 5 years of age, the IDV is based on mutual understanding between the insurer and insured.",
+    "source_section": "Insured's Declared Value",
+    "source_page": 3,
+    "relevant_evidence": [
+      "beyond 5 years",
+      "IDV",
+      "mutual understanding",
+      "insurer and insured"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 32,
+    "category": "clause_lookup",
+    "question": "What is the maximum amount payable for a total loss or constructive total loss?",
+    "expected_answer": "The maximum liability is the IDV less the value of the wreck, subject to the policy terms.",
+    "source_section": "Conditions, Clause 3",
+    "source_page": 7,
+    "relevant_evidence": [
+      "total loss",
+      "constructive total loss",
+      "IDV",
+      "wreck"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 33,
+    "category": "clause_lookup",
+    "question": "How are partial losses settled?",
+    "expected_answer": "Partial losses are settled based on the actual and reasonable costs of repair or replacement, subject to applicable depreciation.",
+    "source_section": "Conditions, Clause 3",
+    "source_page": 7,
+    "relevant_evidence": [
+      "partial losses",
+      "actual and reasonable costs",
+      "repair or replacement",
+      "depreciation"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 34,
+    "category": "specific_value",
+    "question": "How many days' notice is required to cancel the policy?",
+    "expected_answer": "Seven days' notice is required.",
+    "source_section": "Conditions, Clause 5",
+    "source_page": 8,
+    "relevant_evidence": [
+      "cancel the policy",
+      "seven days",
+      "notice"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 35,
+    "category": "specific_value",
+    "question": "What is the minimum premium specified in the policy?",
+    "expected_answer": "The minimum premium is Rs. 100, or Rs. 25 for special vehicles, as specified in the policy.",
+    "source_section": "Conditions, Clause 5",
+    "source_page": 8,
+    "relevant_evidence": [
+      "minimum premium",
+      "Rs.100",
+      "Rs.25"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 36,
+    "category": "coverage_lookup",
+    "question": "Are malicious acts covered under Section I?",
+    "expected_answer": "Yes. Malicious acts are included among the covered causes of loss or damage.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "malicious act"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 37,
+    "category": "coverage_lookup",
+    "question": "Does the policy cover transit of the vehicle by road, rail, inland waterway, lift, elevator or air?",
+    "expected_answer": "Yes. Transit by the listed modes is covered.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "road, rail, inland-waterway, lift, elevator or air"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 38,
+    "category": "coverage_lookup",
+    "question": "Are landslide and rockslide covered?",
+    "expected_answer": "Yes. Landslide and rockslide are included among the covered causes.",
+    "source_section": "Section I, Clause 1",
+    "source_page": 1,
+    "relevant_evidence": [
+      "landslide",
+      "rockslide"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 39,
+    "category": "exclusion",
+    "question": "Is property belonging to the insured covered under third-party property damage?",
+    "expected_answer": "No. Property belonging to the insured is excluded from the third-party property damage cover.",
+    "source_section": "Section II, Clause 1",
+    "source_page": 3,
+    "relevant_evidence": [
+      "property belonging to the insured"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 40,
+    "category": "clause_lookup",
+    "question": "Does the policy indemnify a permitted driver?",
+    "expected_answer": "Yes. A person driving the vehicle on the order of or with the permission of the insured is indemnified subject to the policy terms.",
+    "source_section": "Section II, Clause 3",
+    "source_page": 3,
+    "relevant_evidence": [
+      "person driving the vehicle",
+      "order or with the permission of the insured",
+      "indemnify"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 41,
+    "category": "clause_lookup",
+    "question": "What towing provision is provided by the policy?",
+    "expected_answer": "The policy provides for towing of the vehicle to the nearest repairer, subject to the stated terms and limits.",
+    "source_section": "Section II, Clause 5",
+    "source_page": 3,
+    "relevant_evidence": [
+      "towing",
+      "nearest repairer"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 42,
+    "category": "third_party_liability",
+    "question": "Is bodily injury to an occupant covered when the occupant is not carried for hire or reward?",
+    "expected_answer": "Yes, subject to the policy terms, bodily injury to an occupant not carried for hire or reward is covered.",
+    "source_section": "Section II, Clause 1",
+    "source_page": 3,
+    "relevant_evidence": [
+      "occupant",
+      "bodily injury",
+      "not carried for hire or reward"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 43,
+    "category": "exclusion",
+    "question": "What happens if the vehicle is used outside the permitted geographical area?",
+    "expected_answer": "The policy does not provide cover for use of the vehicle outside the specified geographical area.",
+    "source_section": "General Exceptions, Clause 1",
+    "source_page": 6,
+    "relevant_evidence": [
+      "geographical area",
+      "outside"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 44,
+    "category": "exclusion",
+    "question": "What does the limitations as to use provision restrict?",
+    "expected_answer": "The policy contains restrictions on how the insured vehicle may be used, and cover can be affected when the vehicle is used outside those permitted uses.",
+    "source_section": "General Exceptions, Clause 3",
+    "source_page": 6,
+    "relevant_evidence": [
+      "limitations as to use",
+      "driving",
+      "use of the vehicle"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 45,
+    "category": "exclusion",
+    "question": "Can intoxication affect compensation under the Personal Accident Cover?",
+    "expected_answer": "Yes. Compensation under the Personal Accident Cover may be excluded where the relevant circumstances involve intoxication or intoxicating liquor.",
+    "source_section": "Section III, Personal Accident Cover",
+    "source_page": 4,
+    "relevant_evidence": [
+      "under the influence of intoxicating liquor",
+      "intoxication",
+      "Personal Accident"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 46,
+    "category": "clause_lookup",
+    "question": "How is liability handled when there is other insurance covering the same risk?",
+    "expected_answer": "Where other insurance exists, liability is apportioned on a ratable proportion basis.",
+    "source_section": "Conditions, Clause 6",
+    "source_page": 8,
+    "relevant_evidence": [
+      "other insurance",
+      "ratable proportion"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 47,
+    "category": "regulatory",
+    "question": "What happened to the arbitration clause following the IRDAI circular dated 27/10/2023?",
+    "expected_answer": "The arbitration clause was deleted in accordance with the IRDAI circular dated 27/10/2023.",
+    "source_section": "Conditions, Clause 7",
+    "source_page": 8,
+    "relevant_evidence": [
+      "arbitration",
+      "IRDAI",
+      "27/10/2023",
+      "deleted"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 48,
+    "category": "trick",
+    "question": "What is the exact compulsory deductible amount?",
+    "expected_answer": "The exact compulsory deductible amount cannot be determined from the supplied policy because it is specified in the schedule.",
+    "source_section": "DEDUCTIBLE",
+    "source_page": 7,
+    "relevant_evidence": [
+      "compulsory deductible",
+      "schedule"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 49,
+    "category": "trick",
+    "question": "What is the exact third-party property damage limit?",
+    "expected_answer": "The exact third-party property damage limit cannot be determined from the supplied policy because the applicable limit is schedule-dependent.",
+    "source_section": "Section II, Clause 1",
+    "source_page": 3,
+    "relevant_evidence": [
+      "third party property damage",
+      "limit",
+      "schedule"
+    ],
+    "expected_abstention": false
+  },
+  {
+    "id": 50,
+    "category": "trick",
+    "question": "What is the exact geographical area covered by the policy?",
+    "expected_answer": "The exact geographical area cannot be determined from the supplied schedule.",
+    "source_section": "General Exceptions, Clause 1",
+    "source_page": 6,
+    "relevant_evidence": [
+      "geographical area",
+      "schedule"
+    ],
+    "expected_abstention": false
+  }
+]

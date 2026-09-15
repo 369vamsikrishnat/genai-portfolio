@@ -1,0 +1,463 @@
+{
+  "metrics": {
+    "total_cases": 50,
+    "retrieval_cases": 47,
+    "abstention_cases": 3,
+    "hit_at_1": 0.9149,
+    "hit_at_3": 0.9149,
+    "hit_at_5": 0.9362,
+    "mrr": 0.9202
+  },
+  "results": [
+    {
+      "id": 1,
+      "question": "What events are covered under Section I of the policy?",
+      "expected_abstention": false,
+      "rank": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "hit_at_5": false
+    },
+    {
+      "id": 2,
+      "question": "What depreciation applies to rubber, nylon, plastic parts, tyres, tubes, batteries and airbags?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 3,
+      "question": "What depreciation applies to fibre glass?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 4,
+      "question": "What depreciation applies to glass?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 5,
+      "question": "What depreciation applies to a vehicle exceeding 5 years but not exceeding 10 years?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 6,
+      "question": "What is the maximum amount payable for protection, removal and re-delivery of the vehicle?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 7,
+      "question": "What is the maximum repair authorization amount?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 8,
+      "question": "How is the Insured's Declared Value determined?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 9,
+      "question": "When is a vehicle treated as a constructive total loss?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 10,
+      "question": "What is the maximum compensation under the Personal Accident Cover for the Owner-Driver?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 11,
+      "question": "Is damage caused by flood covered under the policy?",
+      "expected_abstention": false,
+      "rank": 4,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "hit_at_5": true
+    },
+    {
+      "id": 12,
+      "question": "Is theft covered under the policy?",
+      "expected_abstention": false,
+      "rank": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "hit_at_5": false
+    },
+    {
+      "id": 13,
+      "question": "Is accidental external damage covered?",
+      "expected_abstention": false,
+      "rank": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "hit_at_5": false
+    },
+    {
+      "id": 14,
+      "question": "Does the policy provide cover for bodily injury to a third party?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 15,
+      "question": "Does the policy cover damage to third-party property?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 16,
+      "question": "What percentage of the Personal Accident Cover is payable in case of death of the Owner-Driver?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 17,
+      "question": "What percentage is payable for loss of one limb or one eye?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 18,
+      "question": "What should the insured do in case of theft or a criminal act?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 19,
+      "question": "How are claims handled when only tyres or tubes are damaged?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 20,
+      "question": "Who bears the risk of further damage if the vehicle is driven before necessary repairs?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 21,
+      "question": "What is the time limit mentioned for bringing a claim after a disclaimer?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 22,
+      "question": "What happens to the policy if the sole insured dies?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 23,
+      "question": "How long does the insurer have to settle a claim?",
+      "expected_abstention": true,
+      "rank": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "hit_at_5": false
+    },
+    {
+      "id": 24,
+      "question": "What is the maximum age of a vehicle eligible for purchase of this policy?",
+      "expected_abstention": true,
+      "rank": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "hit_at_5": false
+    },
+    {
+      "id": 25,
+      "question": "Which network garages provide cashless repair facilities?",
+      "expected_abstention": true,
+      "rank": null,
+      "hit_at_1": false,
+      "hit_at_3": false,
+      "hit_at_5": false
+    },
+    {
+      "id": 26,
+      "question": "What depreciation applies to the material cost of painting?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 27,
+      "question": "What percentage of the painting cost is treated as the material component when a consolidated painting charge is used?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 28,
+      "question": "What depreciation applies to a vehicle older than 10 years?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 29,
+      "question": "What depreciation applies to a vehicle exceeding 4 years but not exceeding 5 years?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 30,
+      "question": "What depreciation applies to a vehicle exceeding 3 years but not exceeding 4 years?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 31,
+      "question": "How is IDV determined for a vehicle older than 5 years?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 32,
+      "question": "What is the maximum amount payable for a total loss or constructive total loss?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 33,
+      "question": "How are partial losses settled?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 34,
+      "question": "How many days' notice is required to cancel the policy?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 35,
+      "question": "What is the minimum premium specified in the policy?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 36,
+      "question": "Are malicious acts covered under Section I?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 37,
+      "question": "Does the policy cover transit of the vehicle by road, rail, inland waterway, lift, elevator or air?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 38,
+      "question": "Are landslide and rockslide covered?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 39,
+      "question": "Is property belonging to the insured covered under third-party property damage?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 40,
+      "question": "Does the policy indemnify a permitted driver?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 41,
+      "question": "What towing provision is provided by the policy?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 42,
+      "question": "Is bodily injury to an occupant covered when the occupant is not carried for hire or reward?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 43,
+      "question": "What happens if the vehicle is used outside the permitted geographical area?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 44,
+      "question": "What does the limitations as to use provision restrict?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 45,
+      "question": "Can intoxication affect compensation under the Personal Accident Cover?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 46,
+      "question": "How is liability handled when there is other insurance covering the same risk?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 47,
+      "question": "What happened to the arbitration clause following the IRDAI circular dated 27/10/2023?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 48,
+      "question": "What is the exact compulsory deductible amount?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 49,
+      "question": "What is the exact third-party property damage limit?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    },
+    {
+      "id": 50,
+      "question": "What is the exact geographical area covered by the policy?",
+      "expected_abstention": false,
+      "rank": 1,
+      "hit_at_1": true,
+      "hit_at_3": true,
+      "hit_at_5": true
+    }
+  ]
+}

@@ -2,8 +2,16 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# System dependency required by pytesseract
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        tesseract-ocr \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy application
 COPY . .
 
+# Python dependencies
 RUN pip install --no-cache-dir \
     fastapi \
     uvicorn \
