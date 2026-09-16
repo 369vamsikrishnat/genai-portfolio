@@ -1,0 +1,29 @@
+{
+  "experiment": "section-aware vs fixed-size chunking",
+  "configs": {
+    "section_aware": {
+      "chunk_count": 32,
+      "embedding_time_seconds": 30.253785799999605,
+      "metrics": {
+        "recall_at_5": 0.9574468085106383,
+        "hit_at_1": 0.8297872340425532,
+        "hit_at_3": 0.9148936170212766,
+        "hit_at_5": 0.9574468085106383,
+        "mrr": 0.8840264345583494,
+        "avg_latency_seconds": 0.09916407659558048
+      }
+    },
+    "fixed_size": {
+      "chunk_count": 108,
+      "embedding_time_seconds": 10.736403099999734,
+      "metrics": {
+        "recall_at_5": 0.7659574468085106,
+        "hit_at_1": 0.6382978723404256,
+        "hit_at_3": 0.7446808510638298,
+        "hit_at_5": 0.7659574468085106,
+        "mrr": 0.6999662276258021,
+        "avg_latency_seconds": 0.10723947446809264
+      }
+    }
+  }
+}
