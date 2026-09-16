@@ -66,6 +66,10 @@ class CostTracker:
 
         self.total_cost = 0.0
 
+        self.most_expensive_query: dict[
+            str, str | float
+        ] | None = None
+
         self._lock = Lock()
 
     # ========================================================
@@ -171,6 +175,7 @@ class CostTracker:
         input_tokens: int,
         output_tokens: int,
         thinking_tokens: int = 0,
+        query: str | None = None,
     ) -> float:
         """
         Record usage for one model call.
@@ -233,6 +238,19 @@ class CostTracker:
 
             self.total_cost += cost
 
+            if (
+                query is not None
+                and (
+                    self.most_expensive_query is None
+                    or cost
+                    > self.most_expensive_query["cost"]
+                )
+            ):
+                self.most_expensive_query = {
+                    "query": query,
+                    "cost": cost,
+                }
+
         return cost
 
     # ========================================================
@@ -254,7 +272,7 @@ class CostTracker:
                 / self.total_queries
             )
 
-    def snapshot(self) -> dict[str, float | int]:
+    def snapshot(self) -> dict:
         """
         Return a consistent snapshot of current usage.
 
@@ -289,6 +307,9 @@ class CostTracker:
                     )
                     if self.total_queries
                     else 0.0
+                ),
+                "most_expensive_query": (
+                    self.most_expensive_query
                 ),
                 "input_price_per_million": (
                     self.input_price_per_million

@@ -1,0 +1,189 @@
+{
+  "query": "What events are covered under Section I for loss or damage to the insured vehicle?",
+  "repetitions": 3,
+  "without_cache": [
+    {
+      "answer": "Under Section I, the company will indemnify the insured against loss or damage to the insured vehicle and/or its accessories whilst thereon by the following events:\n\n* Fire, explosion, self-ignition, or lightning [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Burglary, housebreaking, or theft [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Riot and strike [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Earthquake (fire and shock damage) [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Flood, typhoon, hurricane, storm, tempest, inundation, cyclone, hailstorm, frost [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Accidental external means [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Malicious act [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Terrorist activity [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Transit by road, rail, inland-waterway, lift, elevator, or air [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Landslide or rockslide [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]",
+      "latency": 4.656160600003204,
+      "cost": 0.0024825,
+      "timings": {
+        "embedding": 0.1428431999956956,
+        "cache_hit": 0.0,
+        "dense": 0.07274640000105137,
+        "bm25": 0.0008218000002671033,
+        "rrf": 6.569999823113903e-05,
+        "rerank": 2.564018800003396,
+        "generate": 1.8753683000031742
+      },
+      "tracker": {
+        "total_queries": 1,
+        "total_input_tokens": 1505,
+        "total_output_tokens": 361,
+        "total_thinking_tokens": 0,
+        "total_billed_output_tokens": 361,
+        "total_cost": 0.0024825,
+        "average_cost_per_query": 0.0024825,
+        "most_expensive_query": {
+          "query": "What events are covered under Section I for loss or damage to the insured vehicle?",
+          "cost": 0.0024825
+        },
+        "input_price_per_million": 0.75,
+        "output_price_per_million": 3.75
+      }
+    },
+    {
+      "answer": "Under Section I, the company will indemnify the insured against loss or damage to the insured vehicle and/or its accessories whilst thereon by the following events:\n\n* Fire, explosion, self-ignition, or lightning [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Burglary, housebreaking, or theft [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Riot and strike [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Earthquake (fire and shock damage) [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Flood, typhoon, hurricane, storm, tempest, inundation, cyclone, hailstorm, frost [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Accidental external means [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Malicious act [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Terrorist activity [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Transit by road, rail, inland-waterway, lift, elevator, or air [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Landslide or rockslide [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]",
+      "latency": 4.731394599999476,
+      "cost": 0.0024825,
+      "timings": {
+        "embedding": 0.12115909999556607,
+        "cache_hit": 0.0,
+        "dense": 0.02703579999797512,
+        "bm25": 0.0009147000018856488,
+        "rrf": 0.00012110000534448773,
+        "rerank": 2.668557900004089,
+        "generate": 1.9135427000001073
+      },
+      "tracker": {
+        "total_queries": 1,
+        "total_input_tokens": 1505,
+        "total_output_tokens": 361,
+        "total_thinking_tokens": 0,
+        "total_billed_output_tokens": 361,
+        "total_cost": 0.0024825,
+        "average_cost_per_query": 0.0024825,
+        "most_expensive_query": {
+          "query": "What events are covered under Section I for loss or damage to the insured vehicle?",
+          "cost": 0.0024825
+        },
+        "input_price_per_million": 0.75,
+        "output_price_per_million": 3.75
+      }
+    },
+    {
+      "answer": "Under Section I, the company will indemnify the insured against loss or damage to the insured vehicle and/or its accessories whilst thereon by the following events:\n\n* Fire, explosion, self-ignition, or lightning [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Burglary, housebreaking, or theft [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Riot and strike [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Earthquake (fire and shock damage) [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Flood, typhoon, hurricane, storm, tempest, inundation, cyclone, hailstorm, frost [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Accidental external means [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Malicious act [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Terrorist activity [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Transit by road, rail, inland-waterway, lift, elevator, or air [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]\n* Landslide or rockslide [Document 3, Page 1, Section I. LOSS OF OR DAMAGE TO THE VEHICLE INSURED]",
+      "latency": 4.48339730000589,
+      "cost": 0.0024825,
+      "timings": {
+        "embedding": 0.13038180000148714,
+        "cache_hit": 0.0,
+        "dense": 0.04024500000377884,
+        "bm25": 0.0015908999994280748,
+        "rrf": 0.00011529999756021425,
+        "rerank": 2.475881499995012,
+        "generate": 1.8350437999979476
+      },
+      "tracker": {
+        "total_queries": 1,
+        "total_input_tokens": 1505,
+        "total_output_tokens": 361,
+        "total_thinking_tokens": 0,
+        "total_billed_output_tokens": 361,
+        "total_cost": 0.0024825,
+        "average_cost_per_query": 0.0024825,
+        "most_expensive_query": {
+          "query": "What events are covered under Section I for loss or damage to the insured vehicle?",
+          "cost": 0.0024825
+        },
+        "input_price_per_million": 0.75,
+        "output_price_per_million": 3.75
+      }
+    }
+  ],
+  "with_cache": [
+    {
+      "answer": "Under Section I, the company will indemnify the insured against loss or damage to the insured vehicle and/or its accessories whilst thereon caused by the following events:\n\n* Fire, explosion, self-ignition, or lightning [Document 3, Page 1, Section I]\n* Burglary, housebreaking, or theft [Document 3, Page 1, Section I]\n* Riot and strike [Document 3, Page 1, Section I]\n* Earthquake (fire and shock damage) [Document 3, Page 1, Section I]\n* Flood, typhoon, hurricane, storm, tempest, inundation, cyclone, hailstorm, frost [Document 3, Page 1, Section I]\n* Accidental external means [Document 3, Page 1, Section I]\n* Malicious act [Document 3, Page 1, Section I]\n* Terrorist activity [Document 3, Page 1, Section I]\n* Transit by road, rail, inland-waterway, lift, elevator, or air [Document 3, Page 1, Section I]\n* Landslide, rockslide [Document 3, Page 1, Section I]",
+      "latency": 4.4258889999982785,
+      "cost": 0.00207375,
+      "timings": {
+        "embedding": 0.11576939999940805,
+        "cache_lookup": 0.002800299997034017,
+        "cache_hit": 0.0,
+        "dense": 0.07959319999645231,
+        "bm25": 0.0011180000001331791,
+        "rrf": 0.00010009999823523685,
+        "rerank": 2.532395100002759,
+        "generate": 1.6377874000027077
+      },
+      "tracker": {
+        "total_queries": 1,
+        "total_input_tokens": 1505,
+        "total_output_tokens": 252,
+        "total_thinking_tokens": 0,
+        "total_billed_output_tokens": 252,
+        "total_cost": 0.00207375,
+        "average_cost_per_query": 0.00207375,
+        "most_expensive_query": {
+          "query": "What events are covered under Section I for loss or damage to the insured vehicle?",
+          "cost": 0.00207375
+        },
+        "input_price_per_million": 0.75,
+        "output_price_per_million": 3.75
+      }
+    },
+    {
+      "answer": "Under Section I, the company will indemnify the insured against loss or damage to the insured vehicle and/or its accessories whilst thereon caused by the following events:\n\n* Fire, explosion, self-ignition, or lightning [Document 3, Page 1, Section I]\n* Burglary, housebreaking, or theft [Document 3, Page 1, Section I]\n* Riot and strike [Document 3, Page 1, Section I]\n* Earthquake (fire and shock damage) [Document 3, Page 1, Section I]\n* Flood, typhoon, hurricane, storm, tempest, inundation, cyclone, hailstorm, frost [Document 3, Page 1, Section I]\n* Accidental external means [Document 3, Page 1, Section I]\n* Malicious act [Document 3, Page 1, Section I]\n* Terrorist activity [Document 3, Page 1, Section I]\n* Transit by road, rail, inland-waterway, lift, elevator, or air [Document 3, Page 1, Section I]\n* Landslide, rockslide [Document 3, Page 1, Section I]",
+      "latency": 0.22187740000663325,
+      "cost": 0.0,
+      "timings": {
+        "embedding": 0.11720610000338638,
+        "cache_lookup": 0.1046411999996053,
+        "cache_hit": 1.0
+      },
+      "tracker": {
+        "total_queries": 0,
+        "total_input_tokens": 0,
+        "total_output_tokens": 0,
+        "total_thinking_tokens": 0,
+        "total_billed_output_tokens": 0,
+        "total_cost": 0.0,
+        "average_cost_per_query": 0.0,
+        "most_expensive_query": null,
+        "input_price_per_million": 0.75,
+        "output_price_per_million": 3.75
+      }
+    },
+    {
+      "answer": "Under Section I, the company will indemnify the insured against loss or damage to the insured vehicle and/or its accessories whilst thereon caused by the following events:\n\n* Fire, explosion, self-ignition, or lightning [Document 3, Page 1, Section I]\n* Burglary, housebreaking, or theft [Document 3, Page 1, Section I]\n* Riot and strike [Document 3, Page 1, Section I]\n* Earthquake (fire and shock damage) [Document 3, Page 1, Section I]\n* Flood, typhoon, hurricane, storm, tempest, inundation, cyclone, hailstorm, frost [Document 3, Page 1, Section I]\n* Accidental external means [Document 3, Page 1, Section I]\n* Malicious act [Document 3, Page 1, Section I]\n* Terrorist activity [Document 3, Page 1, Section I]\n* Transit by road, rail, inland-waterway, lift, elevator, or air [Document 3, Page 1, Section I]\n* Landslide, rockslide [Document 3, Page 1, Section I]",
+      "latency": 0.12963049999962095,
+      "cost": 0.0,
+      "timings": {
+        "embedding": 0.12608779999573017,
+        "cache_lookup": 0.0035012999942409806,
+        "cache_hit": 1.0
+      },
+      "tracker": {
+        "total_queries": 0,
+        "total_input_tokens": 0,
+        "total_output_tokens": 0,
+        "total_thinking_tokens": 0,
+        "total_billed_output_tokens": 0,
+        "total_cost": 0.0,
+        "average_cost_per_query": 0.0,
+        "most_expensive_query": null,
+        "input_price_per_million": 0.75,
+        "output_price_per_million": 3.75
+      }
+    }
+  ],
+  "metrics": {
+    "without_cache": {
+      "average_latency": 4.62365083333619,
+      "total_cost": 0.007447499999999999
+    },
+    "with_cache": {
+      "average_latency": 1.5924656333348441,
+      "total_cost": 0.00207375
+    },
+    "latency_savings_percent": 65.55826357273172,
+    "cost_savings_percent": 72.15508559919435,
+    "cache_stats": {
+      "hits": 2,
+      "misses": 1,
+      "total_requests": 3,
+      "hit_rate": 0.6666666666666666,
+      "similarity_threshold": 0.95,
+      "ttl_seconds": 86400
+    }
+  }
+}
