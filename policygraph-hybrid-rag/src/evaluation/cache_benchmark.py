@@ -4,445 +4,279 @@ import json
 import statistics
 import time
 from pathlib import Path
+from typing import Any
 
 from src.api.cost_tracker import CostTracker
-from src.pipeline import run_pipeline, get_semantic_cache
+from src.pipeline import get_semantic_cache, run_pipeline
 
 
-QUERY = (
-    "What events are covered under Section I "
-    "for loss or damage to the insured vehicle?"
+TEST_SET_PATH = Path(
+    "src/evaluation/semantic_cache_test_set.json"
 )
-
-REPETITIONS = 3
-
-COMPARISON_FILE = Path(
-    "eval/comparison_results.md"
-)
+OFF_REPETITIONS = 1
+ON_REPETITIONS = 2
+RESULTS_PATH = Path("eval/cache_benchmark_results.json")
+COMPARISON_PATH = Path("eval/comparison_results.md")
 
 
-def run_once(
+def load_queries() -> list[dict[str, Any]]:
+    with TEST_SET_PATH.open("r", encoding="utf-8") as file:
+        queries = json.load(file)
+
+    if not isinstance(queries, list) or not queries:
+        raise ValueError("Semantic cache test set must be a non-empty list.")
+
+    for query in queries:
+        if "id" not in query or "question" not in query:
+            raise ValueError("Each test-set item needs id and question.")
+
+    return queries
+
+
+def run_request(
+    query_id: str,
     query: str,
-    use_cache: bool,
-):
+    cache_enabled: bool,
+    request_number: int,
+) -> dict[str, Any]:
     tracker = CostTracker()
+    started = time.perf_counter()
 
-    start = time.perf_counter()
-
-    (
-        answer,
-        results,
-        timings,
-        cost,
-        tracker,
-    ) = run_pipeline(
+    answer, _results, timings, cost, _tracker = run_pipeline(
         query=query,
         tracker=tracker,
-        use_cache=use_cache,
+        use_cache=cache_enabled,
     )
 
-    total_latency = (
-        time.perf_counter() - start
-    )
+    latency_ms = (time.perf_counter() - started) * 1000
+    cache_hit = bool(timings.get("cache_hit", 0.0))
+    generation_model = timings.get("generation_model")
 
     return {
+        "run_id": None,
+        "query_id": query_id,
+        "query": query,
+        "cache": "ON" if cache_enabled else "OFF",
+        "request_number": request_number,
+        "cache_result": (
+            ("HIT" if cache_hit else "MISS")
+            if cache_enabled
+            else "N/A"
+        ),
+        "gemini_called": not cache_hit,
+        "gemini_model": generation_model,
+        "latency_ms": round(latency_ms, 3),
+        "input_tokens": int(timings.get("input_tokens", 0)),
+        "output_tokens": int(timings.get("output_tokens", 0)),
+        "thinking_tokens": int(timings.get("thinking_tokens", 0)),
+        "total_tokens": (
+            int(timings.get("input_tokens", 0))
+            + int(timings.get("output_tokens", 0))
+            + int(timings.get("thinking_tokens", 0))
+        ),
+        "llm_cost_usd": round(float(cost or 0.0), 10),
         "answer": answer,
-        "latency": total_latency,
-        "cost": cost or 0.0,
-        "timings": timings,
-        "tracker": tracker.snapshot(),
     }
 
 
-def benchmark_without_cache():
-    print("\n" + "=" * 60)
-    print("WITHOUT CACHE")
-    print("=" * 60)
+def run_group(
+    queries: list[dict[str, Any]],
+    cache_enabled: bool,
+    next_run_id: int,
+) -> tuple[list[dict[str, Any]], int]:
+    rows: list[dict[str, Any]] = []
+    repetitions = ON_REPETITIONS if cache_enabled else OFF_REPETITIONS
 
-    results = []
+    for query in queries:
+        query_id = f"Q{int(query['id']):02d}"
 
-    for i in range(
-        1,
-        REPETITIONS + 1,
-    ):
-        print(
-            f"\nRun {i}/{REPETITIONS}"
-        )
+        for request_number in range(1, repetitions + 1):
+            print(
+                f"{('CACHE ON' if cache_enabled else 'CACHE OFF')} "
+                f"{query_id} request {request_number}/{repetitions}"
+            )
+            row = run_request(
+                query_id,
+                query["question"],
+                cache_enabled,
+                request_number,
+            )
+            row["run_id"] = next_run_id
+            rows.append(row)
+            next_run_id += 1
 
-        result = run_once(
-            query=QUERY,
-            use_cache=False,
-        )
-
-        results.append(result)
-
-        print(
-            f"Latency: {result['latency']:.4f}s"
-        )
-        print(
-            f"Cost: ${result['cost']:.6f}"
-        )
-
-    return results
+    return rows, next_run_id
 
 
-def benchmark_with_cache():
-    print("\n" + "=" * 60)
-    print("WITH CACHE")
-    print("=" * 60)
-
-    cache = get_semantic_cache()
-
-    cache.client.flushdb()
-
-    print(
-        "\nRedis cache cleared."
-    )
-
-    results = []
-
-    for i in range(
-        1,
-        REPETITIONS + 1,
-    ):
-        print(
-            f"\nRun {i}/{REPETITIONS}"
-        )
-
-        result = run_once(
-            query=QUERY,
-            use_cache=True,
-        )
-
-        results.append(result)
-
-        print(
-            f"Latency: {result['latency']:.4f}s"
-        )
-        print(
-            f"Cost: ${result['cost']:.6f}"
-        )
-        print(
-            f"Cache hit: "
-            f"{result['timings'].get('cache_hit', 0.0)}"
-        )
-
-    return results
-
-
-def average(
-    values: list[float],
-) -> float:
-    return statistics.mean(values)
-
-
-def calculate_metrics(
-    without_cache,
-    with_cache,
-):
-    without_latencies = [
-        result["latency"]
-        for result in without_cache
-    ]
-
-    with_latencies = [
-        result["latency"]
-        for result in with_cache
-    ]
-
-    without_costs = [
-        result["cost"]
-        for result in without_cache
-    ]
-
-    with_costs = [
-        result["cost"]
-        for result in with_cache
-    ]
-
-    without_avg_latency = average(
-        without_latencies
-    )
-
-    with_avg_latency = average(
-        with_latencies
-    )
-
-    without_total_cost = sum(
-        without_costs
-    )
-
-    with_total_cost = sum(
-        with_costs
-    )
-
-    latency_savings = (
-        (
-            without_avg_latency
-            - with_avg_latency
-        )
-        / without_avg_latency
-        * 100
-        if without_avg_latency
-        else 0.0
-    )
-
-    cost_savings = (
-        (
-            without_total_cost
-            - with_total_cost
-        )
-        / without_total_cost
-        * 100
-        if without_total_cost
-        else 0.0
-    )
-
-    cache = get_semantic_cache()
+def aggregate(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    requests = len(rows)
+    hits = sum(row["cache_result"] == "HIT" for row in rows)
+    misses = sum(row["cache_result"] == "MISS" for row in rows)
+    calls = sum(row["gemini_called"] for row in rows)
+    latencies = [row["latency_ms"] for row in rows]
+    total_cost = sum(row["llm_cost_usd"] for row in rows)
 
     return {
-        "without_cache": {
-            "average_latency": without_avg_latency,
-            "total_cost": without_total_cost,
-        },
-        "with_cache": {
-            "average_latency": with_avg_latency,
-            "total_cost": with_total_cost,
-        },
-        "latency_savings_percent": latency_savings,
-        "cost_savings_percent": cost_savings,
-        "cache_stats": cache.stats(),
+        "total_requests": requests,
+        "cache_hits": hits,
+        "cache_misses": misses,
+        "gemini_calls": calls,
+        "total_input_tokens": sum(row["input_tokens"] for row in rows),
+        "total_output_tokens": sum(row["output_tokens"] for row in rows),
+        "total_thinking_tokens": sum(row["thinking_tokens"] for row in rows),
+        "total_tokens": sum(row["total_tokens"] for row in rows),
+        "total_llm_cost_usd": total_cost,
+        "average_cost_per_request_usd": (
+            total_cost / requests if requests else 0.0
+        ),
+        "average_latency_ms": statistics.mean(latencies) if latencies else 0.0,
+        "minimum_latency_ms": min(latencies) if latencies else 0.0,
+        "maximum_latency_ms": max(latencies) if latencies else 0.0,
+        "cache_hit_rate": hits / requests if requests else 0.0,
     }
 
 
-def update_comparison_file(
-    metrics: dict,
-):
-    existing = ""
+def percent_change(before: float, after: float) -> float:
+    return ((before - after) / before * 100) if before else 0.0
 
-    if COMPARISON_FILE.exists():
-        existing = (
-            COMPARISON_FILE.read_text(
-                encoding="utf-8"
-            )
+
+def write_report(
+    rows: list[dict[str, Any]],
+    off: dict[str, Any],
+    on: dict[str, Any],
+    cache: Any,
+) -> None:
+    cost_savings = off["total_llm_cost_usd"] - on["total_llm_cost_usd"]
+    latency_reduction = off["average_latency_ms"] - on["average_latency_ms"]
+    comparison = {
+        "gemini_calls_avoided": off["gemini_calls"] - on["gemini_calls"],
+        "cost_savings_usd": cost_savings,
+        "cost_savings_percent": percent_change(
+            off["total_llm_cost_usd"],
+            on["total_llm_cost_usd"],
+        ),
+        "latency_reduction_ms": latency_reduction,
+        "latency_reduction_percent": percent_change(
+            off["average_latency_ms"],
+            on["average_latency_ms"],
+        ),
+    }
+
+    raw_lines = [
+        "| Run ID | Query ID | Cache | Request # | Cache Result | Gemini Called | Gemini Model | Latency (ms) | Input Tokens | Output Tokens | Total Tokens | LLM Cost ($) |",
+        "|---:|---|---|---:|---|---|---|---:|---:|---:|---:|---:|",
+    ]
+    for row in rows:
+        raw_lines.append(
+            f"| {row['run_id']} | {row['query_id']} | {row['cache']} | "
+            f"{row['request_number']} | {row['cache_result']} | "
+            f"{'Yes' if row['gemini_called'] else 'No'} | "
+            f"{row['gemini_model'] or '-'} | {row['latency_ms']:.3f} | "
+            f"{row['input_tokens']} | {row['output_tokens']} | "
+            f"{row['total_tokens']} | {row['llm_cost_usd']:.10f} |"
         )
 
-    marker = "\n## Day 14 — Semantic Cache Benchmark\n"
-
-    if marker in existing:
-        existing = existing.split(
-            marker,
-            1,
-        )[0]
-
-    without_cache = metrics[
-        "without_cache"
+    summary_lines = [
+        "| Metric | Cache OFF | Cache ON |",
+        "|---|---:|---:|",
     ]
+    summary_metrics = (
+        ("Total requests", "total_requests", ""),
+        ("Cache hits", "cache_hits", ""),
+        ("Cache misses", "cache_misses", ""),
+        ("Gemini calls", "gemini_calls", ""),
+        ("Total input tokens", "total_input_tokens", ""),
+        ("Total output tokens", "total_output_tokens", ""),
+        ("Total LLM cost ($)", "total_llm_cost_usd", ".10f"),
+        ("Average cost/request ($)", "average_cost_per_request_usd", ".10f"),
+        ("Average latency (ms)", "average_latency_ms", ".3f"),
+        ("Minimum latency (ms)", "minimum_latency_ms", ".3f"),
+        ("Maximum latency (ms)", "maximum_latency_ms", ".3f"),
+        ("Cache hit rate", "cache_hit_rate", ".2%"),
+    )
+    for label, key, format_spec in summary_metrics:
+        off_value = format(off[key], format_spec) if format_spec else str(off[key])
+        on_value = format(on[key], format_spec) if format_spec else str(on[key])
+        if "$" in label:
+            off_value = "$" + off_value
+            on_value = "$" + on_value
+        summary_lines.append(f"| {label} | {off_value} | {on_value} |")
 
-    with_cache = metrics[
-        "with_cache"
-    ]
+    report = f"""# Redis Semantic Cache Benchmark
 
-    cache_stats = metrics[
-        "cache_stats"
-    ]
+Test set: `{TEST_SET_PATH}`  
+Unique queries: `{len({row['query_id'] for row in rows})}`  
+Cache OFF repetitions: `{OFF_REPETITIONS}`  
+Cache ON repetitions: `{ON_REPETITIONS}`  
+Similarity threshold: `{cache.similarity_threshold}`  
+TTL: `{cache.ttl_seconds}` seconds
 
-    section = f"""
-## Day 14 — Semantic Cache Benchmark
+## Raw Experiment Table
 
-### Benchmark Configuration
+{chr(10).join(raw_lines)}
 
-- Query: `{QUERY}`
-- Repetitions: {REPETITIONS}
-- Semantic similarity threshold: {cache_stats["similarity_threshold"]}
-- Cache TTL: {cache_stats["ttl_seconds"]} seconds
+## Summary Table
 
-### Cost and Latency
+{chr(10).join(summary_lines)}
 
-| Configuration | Avg Latency | Total Cost |
-|---|---:|---:|
-| Without Cache | {without_cache["average_latency"]:.4f}s | ${without_cache["total_cost"]:.6f} |
-| With Cache | {with_cache["average_latency"]:.4f}s | ${with_cache["total_cost"]:.6f} |
+## Cache Impact
 
-### Cache Performance
-
-| Metric | Result |
+| Metric | Value |
 |---|---:|
-| Cache Hits | {cache_stats["hits"]} |
-| Cache Misses | {cache_stats["misses"]} |
-| Total Cache Requests | {cache_stats["total_requests"]} |
-| Cache Hit Rate | {cache_stats["hit_rate"] * 100:.2f}% |
-| Latency Savings | {metrics["latency_savings_percent"]:.2f}% |
-| Cost Savings | {metrics["cost_savings_percent"]:.2f}% |
+| Gemini calls avoided | {comparison['gemini_calls_avoided']} |
+| Cost savings ($) | {comparison['cost_savings_usd']:.10f} |
+| Cost savings (%) | {comparison['cost_savings_percent']:.2f}% |
+| Latency reduction (ms) | {comparison['latency_reduction_ms']:.3f} |
+| Latency reduction (%) | {comparison['latency_reduction_percent']:.2f}% |
 
-### Notes
+## Project Story
 
-The benchmark repeats the same query multiple times.
-
-Without cache, every request executes the full retrieval and generation pipeline.
-
-With cache, the first request populates Redis and subsequent semantically equivalent requests can return the cached answer without executing the retrieval, reranking, or generation stages.
-
-The measured results are specific to this benchmark query, repetition count, model configuration, and local environment.
+Redis semantic caching achieved **{on['cache_hit_rate']:.2%} cache hit rate**, avoiding **{comparison['gemini_calls_avoided']} Gemini calls**, reducing LLM cost by **{comparison['cost_savings_percent']:.2f}%**, and reducing average response latency by **{comparison['latency_reduction_percent']:.2f}%** across this repeated-query workload.
 """
 
-    COMPARISON_FILE.write_text(
-        existing.rstrip()
-        + "\n"
-        + section.strip()
-        + "\n",
-        encoding="utf-8",
-    )
+    COMPARISON_PATH.parent.mkdir(parents=True, exist_ok=True)
+    COMPARISON_PATH.write_text(report, encoding="utf-8")
 
-
-def main():
-    print("\n" + "#" * 60)
-    print("DAY 14 — CACHE BENCHMARK")
-    print("#" * 60)
-
-    # ---------------------------------------------------------
-    # Warm up local models and clients.
-    # This prevents model-loading overhead from dominating
-    # the benchmark.
-    # ---------------------------------------------------------
-
-    print("\nWarming up pipeline...")
-
-    warmup_tracker = CostTracker()
-
-    run_pipeline(
-        query=(
-            "What is covered under the motor insurance policy?"
-        ),
-        tracker=warmup_tracker,
-        use_cache=False,
-    )
-
-    # ---------------------------------------------------------
-    # Run benchmarks
-    # ---------------------------------------------------------
-
-    without_cache = (
-        benchmark_without_cache()
-    )
-
-    with_cache = (
-        benchmark_with_cache()
-    )
-
-    # ---------------------------------------------------------
-    # Calculate metrics
-    # ---------------------------------------------------------
-
-    metrics = calculate_metrics(
-        without_cache=without_cache,
-        with_cache=with_cache,
-    )
-
-    # ---------------------------------------------------------
-    # Display results
-    # ---------------------------------------------------------
-
-    print("\n" + "#" * 60)
-    print("FINAL RESULTS")
-    print("#" * 60)
-
-    print(
-        "\nWITHOUT CACHE"
-    )
-    print(
-        f"Average latency: "
-        f"{metrics['without_cache']['average_latency']:.4f}s"
-    )
-    print(
-        f"Total cost: "
-        f"${metrics['without_cache']['total_cost']:.6f}"
-    )
-
-    print(
-        "\nWITH CACHE"
-    )
-    print(
-        f"Average latency: "
-        f"{metrics['with_cache']['average_latency']:.4f}s"
-    )
-    print(
-        f"Total cost: "
-        f"${metrics['with_cache']['total_cost']:.6f}"
-    )
-
-    print(
-        "\nCACHE"
-    )
-    print(
-        f"Hits: "
-        f"{metrics['cache_stats']['hits']}"
-    )
-    print(
-        f"Misses: "
-        f"{metrics['cache_stats']['misses']}"
-    )
-    print(
-        f"Hit rate: "
-        f"{metrics['cache_stats']['hit_rate'] * 100:.2f}%"
-    )
-
-    print(
-        "\nSAVINGS"
-    )
-    print(
-        f"Latency savings: "
-        f"{metrics['latency_savings_percent']:.2f}%"
-    )
-    print(
-        f"Cost savings: "
-        f"{metrics['cost_savings_percent']:.2f}%"
-    )
-
-    # ---------------------------------------------------------
-    # Save machine-readable results
-    # ---------------------------------------------------------
-
-    output_path = Path(
-        "eval/cache_benchmark_results.json"
-    )
-
-    output_path.parent.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    output_path.write_text(
+    RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    RESULTS_PATH.write_text(
         json.dumps(
             {
-                "query": QUERY,
-                "repetitions": REPETITIONS,
-                "without_cache": without_cache,
-                "with_cache": with_cache,
-                "metrics": metrics,
+                "test_set": str(TEST_SET_PATH),
+                "query_count": len({row["query_id"] for row in rows}),
+                "off_repetitions": OFF_REPETITIONS,
+                "on_repetitions": ON_REPETITIONS,
+                "raw_requests": rows,
+                "summary": {"cache_off": off, "cache_on": on},
+                "comparison": comparison,
+                "cache_configuration": cache.stats(),
             },
             indent=2,
         ),
         encoding="utf-8",
     )
 
-    # ---------------------------------------------------------
-    # Update Day 14 comparison document
-    # ---------------------------------------------------------
 
-    update_comparison_file(
-        metrics
-    )
+def main() -> None:
+    queries = load_queries()
+    cache = get_semantic_cache()
+    cache.client.flushdb()
 
-    print(
-        "\nSaved:"
+    print("Running cache OFF benchmark...")
+    off_rows, next_run_id = run_group(queries, False, 1)
+
+    cache.client.flushdb()
+    print("Running cache ON benchmark...")
+    on_rows, _ = run_group(queries, True, next_run_id)
+
+    rows = off_rows + on_rows
+    write_report(
+        rows,
+        aggregate(off_rows),
+        aggregate(on_rows),
+        cache,
     )
-    print(
-        "eval/cache_benchmark_results.json"
-    )
-    print(
-        "eval/comparison_results.md"
-    )
+    print(f"Saved {COMPARISON_PATH}")
+    print(f"Saved {RESULTS_PATH}")
 
 
 if __name__ == "__main__":

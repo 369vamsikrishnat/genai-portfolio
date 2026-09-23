@@ -37,7 +37,7 @@ services:
       LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY}
       LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL}
 
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/policygraph
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/policygraph}
 
     ports:
       - "8000:8000"

@@ -6,15 +6,13 @@ import os
 from pathlib import Path
 from typing import Any
 
-import instructor
-from openai import AsyncOpenAI
-from ragas.llms import llm_factory
-
 from dotenv import load_dotenv
 from google import genai
+from google.genai import errors
 from google.genai import types
 from pydantic import BaseModel
 from ragas.embeddings import GoogleEmbeddings
+from ragas.llms.base import InstructorBaseRagasLLM
 from ragas.metrics.collections import (
     AnswerRelevancy,
     ContextPrecision,
@@ -23,6 +21,7 @@ from ragas.metrics.collections import (
 )
 
 from src.pipeline import run_pipeline
+from src.api.gemini_model_fallback import get_model_candidates
 
 
 # ---------------------------------------------------------------------------
@@ -42,10 +41,25 @@ EVALUATION_MODEL = os.getenv(
 
 EMBEDDING_MODEL = os.getenv(
     "RAGAS_EMBEDDING_MODEL",
-    "text-embedding-004",
+    "gemini-embedding-001",
 )
 
-RAGAS_SAMPLE_SIZE = 5
+RAGAS_SAMPLE_SIZE = int(
+    os.getenv(
+        "RAGAS_SAMPLE_SIZE",
+        "50",
+    )
+)
+
+RAGAS_AUTO_CONTINUE = os.getenv(
+    "RAGAS_AUTO_CONTINUE",
+    "true",
+).lower() in {
+    "1",
+    "true",
+    "yes",
+    "y",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -67,7 +81,7 @@ def get_gemini_api_key() -> str:
 # NATIVE GEMINI RAGAS LLM
 # ---------------------------------------------------------------------------
 
-class GeminiRagasLLM:
+class GeminiRagasLLM(InstructorBaseRagasLLM):
     """
     Minimal RAGAS-compatible LLM adapter using the native google-genai SDK.
 
@@ -82,6 +96,7 @@ class GeminiRagasLLM:
     ) -> None:
         self.client = client
         self.model_name = model_name
+        self.model_candidates = get_model_candidates(model_name)
 
     async def agenerate(
         self,
@@ -89,15 +104,46 @@ class GeminiRagasLLM:
         response_model: type[BaseModel],
         **kwargs: Any,
     ) -> BaseModel:
-        response = await self.client.aio.models.generate_content(
-            model=self.model_name,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                temperature=0,
-                response_mime_type="application/json",
-                response_schema=response_model,
-            ),
-        )
+        response = None
+        failures: list[str] = []
+
+        for model in self.model_candidates:
+            try:
+                response = await self.client.aio.models.generate_content(
+                    model=model,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        temperature=0,
+                        response_mime_type="application/json",
+                        response_schema=response_model,
+                    ),
+                )
+                self.model_name = model
+                break
+
+            except errors.APIError as exc:
+                failures.append(
+                    f"{model}: {exc.code} {exc.status}"
+                )
+                print(
+                    f"RAGAS evaluation failed with {model}; "
+                    "trying the next model."
+                )
+
+            except Exception as exc:
+                failures.append(
+                    f"{model}: {type(exc).__name__}: {exc}"
+                )
+                print(
+                    f"RAGAS evaluation failed with {model}; "
+                    "trying the next model."
+                )
+
+        if response is None:
+            raise RuntimeError(
+                "All RAGAS Gemini models failed: "
+                + "; ".join(failures)
+            )
 
         parsed = getattr(response, "parsed", None)
 
@@ -136,19 +182,11 @@ class GeminiRagasLLM:
 
 
 def create_ragas_llm():
-    api_key = get_gemini_api_key()
-
-    client = AsyncOpenAI(
-        api_key=api_key,
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-    )
-
-    return llm_factory(
-        EVALUATION_MODEL,
-        provider="openai",
-        client=client,
-        adapter="instructor",
-        temperature=0,
+    return GeminiRagasLLM(
+        client=genai.Client(
+            api_key=get_gemini_api_key(),
+        ),
+        model_name=EVALUATION_MODEL,
     )
 
 
@@ -237,6 +275,7 @@ def evaluate_case(
 
     pipeline_result = run_pipeline(
         query=question,
+        use_cache=False,
     )
 
     if not isinstance(pipeline_result, tuple):
@@ -261,6 +300,123 @@ def evaluate_case(
         "answer": answer,
         "contexts": contexts,
     }
+
+
+def score_case(
+    row: dict[str, Any],
+    metrics: list[Any],
+) -> dict[str, Any]:
+    metric_row: dict[str, Any] = {
+        "id": row["id"],
+        "question": row["question"],
+        "expected_answer": row["expected_answer"],
+        "answer": row["answer"],
+        "contexts": row["contexts"],
+    }
+
+    for metric in metrics:
+        metric_name = metric.name
+
+        existing_score = row.get(metric_name)
+
+        if isinstance(existing_score, (int, float)):
+            metric_row[metric_name] = existing_score
+            print(
+                f"  - {metric_name}: already saved, skipping"
+            )
+            continue
+
+        print(
+            f"  - {metric_name}"
+        )
+
+        try:
+            if metric_name == "faithfulness":
+                score = metric.score(
+                    user_input=row["question"],
+                    response=row["answer"],
+                    retrieved_contexts=row["contexts"],
+                )
+
+            elif metric_name == "answer_relevancy":
+                score = metric.score(
+                    user_input=row["question"],
+                    response=row["answer"],
+                )
+
+            elif metric_name == "context_precision":
+                score = metric.score(
+                    user_input=row["question"],
+                    retrieved_contexts=row["contexts"],
+                    reference=row["expected_answer"],
+                )
+
+            elif metric_name == "context_recall":
+                score = metric.score(
+                    user_input=row["question"],
+                    retrieved_contexts=row["contexts"],
+                    reference=row["expected_answer"],
+                )
+
+            else:
+                continue
+
+            metric_row[metric_name] = float(score)
+
+        except Exception as exc:
+            metric_row[metric_name] = {
+                "error": str(exc)
+            }
+
+    return metric_row
+
+
+def load_saved_results() -> dict[int, dict[str, Any]]:
+    if not OUTPUT_PATH.exists():
+        return {}
+
+    try:
+        with OUTPUT_PATH.open(
+            "r",
+            encoding="utf-8",
+        ) as file:
+            output = json.load(file)
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+    return {
+        int(row["id"]): row
+        for row in output.get("results", [])
+        if "id" in row
+    }
+
+
+def save_results(
+    results: list[dict[str, Any]],
+    sample_size: int,
+) -> None:
+    OUTPUT_PATH.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    output = {
+        "evaluation_model": EVALUATION_MODEL,
+        "embedding_model": EMBEDDING_MODEL,
+        "sample_size": sample_size,
+        "results": results,
+    }
+
+    with OUTPUT_PATH.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
+        json.dump(
+            output,
+            file,
+            indent=2,
+            ensure_ascii=False,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -291,6 +447,7 @@ def main() -> None:
     )
     print()
 
+    saved_results = load_saved_results()
     ragas_llm = create_ragas_llm()
     ragas_embeddings = create_ragas_embeddings()
 
@@ -308,7 +465,11 @@ def main() -> None:
         ),
     ]
 
-    evaluation_rows: list[dict[str, Any]] = []
+    metric_results: list[dict[str, Any]] = [
+        saved_results[case["id"]]
+        for case in sample
+        if case["id"] in saved_results
+    ]
 
     for index, case in enumerate(
         sample,
@@ -321,107 +482,65 @@ def main() -> None:
             f"{case['question']}"
         )
 
-        result = evaluate_case(
-            case,
-            ragas_llm,
-            ragas_embeddings,
-        )
+        saved_row = saved_results.get(case["id"])
 
-        evaluation_rows.append(
-            result
-        )
-
-    print()
-    print("Running RAGAS metrics...")
-    print()
-
-    metric_results: list[dict[str, Any]] = []
-
-    for row in evaluation_rows:
-
-        print(
-            f"Scoring {row['id']}..."
-        )
-
-        metric_row: dict[str, Any] = {
-            "id": row["id"],
-            "question": row["question"],
-        }
-
-        for metric in metrics:
-
-            metric_name = metric.name
-
+        if saved_row and saved_row.get("answer") and saved_row.get("contexts"):
+            evaluation_row = saved_row
             print(
-                f"  - {metric_name}"
+                "Using saved answer and contexts; only missing metrics will run."
+            )
+        else:
+            evaluation_row = evaluate_case(
+                case,
+                ragas_llm,
+                ragas_embeddings,
             )
 
-            try:
-                if metric_name == "faithfulness":
-                    score = metric.score(
-                        user_input=row["question"],
-                        response=row["answer"],
-                        retrieved_contexts=row["contexts"],
-                    )
-
-                elif metric_name == "answer_relevancy":
-                    score = metric.score(
-                        user_input=row["question"],
-                        response=row["answer"],
-                    )
-
-                elif metric_name == "context_precision":
-                    score = metric.score(
-                        user_input=row["question"],
-                        retrieved_contexts=row["contexts"],
-                        reference=row["expected_answer"],
-                    )
-
-                elif metric_name == "context_recall":
-                    score = metric.score(
-                        user_input=row["question"],
-                        retrieved_contexts=row["contexts"],
-                        reference=row["expected_answer"],
-                    )
-
-                else:
-                    continue
-
-                metric_row[metric_name] = float(
-                    score
-                )
-
-            except Exception as exc:
-                metric_row[metric_name] = {
-                    "error": str(exc)
-                }
-
-        metric_results.append(
-            metric_row
+        print(
+            f"Scoring {case['id']}..."
         )
 
-    OUTPUT_PATH.parent.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    output = {
-        "evaluation_model": EVALUATION_MODEL,
-        "embedding_model": EMBEDDING_MODEL,
-        "sample_size": len(sample),
-        "results": metric_results,
-    }
-
-    with OUTPUT_PATH.open(
-        "w",
-        encoding="utf-8",
-    ) as file:
-        json.dump(
-            output,
-            file,
-            indent=2,
-            ensure_ascii=False,
+        metric_row = score_case(
+            evaluation_row,
+            metrics,
         )
+
+        metric_results = [
+            row
+            for row in metric_results
+            if row.get("id") != case["id"]
+        ]
+        metric_results.append(metric_row)
+
+        save_results(
+            metric_results,
+            sample_size=len(sample),
+        )
+
+        print()
+        print(json.dumps(metric_row, indent=2, ensure_ascii=False))
+        print()
+
+        if index == len(sample):
+            break
+
+        if RAGAS_AUTO_CONTINUE:
+            continue
+
+        while True:
+            confirmation = input(
+                "Review this result. Type 'yes' to generate the next question "
+                "or 'no' to stop: "
+            ).strip().lower()
+
+            if confirmation in {"yes", "y", "next"}:
+                break
+
+            if confirmation in {"no", "n", "q", "quit", "exit"}:
+                print("Evaluation stopped. Completed results were saved.")
+                return
+
+            print("Please type 'yes' to continue or 'no' to stop.")
 
     print()
     print("=" * 70)

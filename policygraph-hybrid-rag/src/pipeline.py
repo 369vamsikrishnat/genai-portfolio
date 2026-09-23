@@ -177,6 +177,11 @@ def run_pipeline(
             )
 
             timings["cache_hit"] = 1.0
+            timings["generation_model"] = None
+            timings["input_tokens"] = 0
+            timings["output_tokens"] = 0
+            timings["thinking_tokens"] = 0
+            timings["cost"] = 0.0
 
             return (
                 cached_result["answer"],
@@ -275,7 +280,7 @@ def run_pipeline(
 
     client = get_gemini_client()
 
-    answer, usage_metadata = generate(
+    answer, usage_metadata, generation_model = generate(
         question=query,
         documents=[
             chunk
@@ -287,6 +292,7 @@ def run_pipeline(
     timings["generate"] = (
         time.perf_counter() - start
     )
+    timings["generation_model"] = generation_model
 
     # --------------------------------------------------
     # Token usage
@@ -309,6 +315,7 @@ def run_pipeline(
         output_tokens=output_tokens,
         thinking_tokens=thinking_tokens,
         query=query,
+        model=generation_model,
     )
 
     # --------------------------------------------------
@@ -334,3 +341,8 @@ def run_pipeline(
         cost,
         tracker,
     )
+
+    timings["input_tokens"] = input_tokens
+    timings["output_tokens"] = output_tokens
+    timings["thinking_tokens"] = thinking_tokens
+    timings["cost"] = cost

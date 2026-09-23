@@ -129,6 +129,7 @@ class CostTracker:
         self,
         input_tokens: int,
         output_tokens: int,
+        model: str | None = None,
     ) -> float:
         """
         Calculate cost for a single model call.
@@ -149,16 +150,18 @@ class CostTracker:
             "output_tokens",
         )
 
+        input_price, output_price = self._get_model_prices(model)
+
         input_cost = (
             input_tokens
             / 1_000_000
-            * self.input_price_per_million
+            * input_price
         )
 
         output_cost = (
             output_tokens
             / 1_000_000
-            * self.output_price_per_million
+            * output_price
         )
 
         return (
@@ -176,6 +179,7 @@ class CostTracker:
         output_tokens: int,
         thinking_tokens: int = 0,
         query: str | None = None,
+        model: str | None = None,
     ) -> float:
         """
         Record usage for one model call.
@@ -214,6 +218,7 @@ class CostTracker:
         cost = self.calculate_cost(
             input_tokens=input_tokens,
             output_tokens=billed_output_tokens,
+            model=model,
         )
 
         with self._lock:
@@ -249,9 +254,33 @@ class CostTracker:
                 self.most_expensive_query = {
                     "query": query,
                     "cost": cost,
+                        "model": model or "unknown",
                 }
 
         return cost
+
+    def _get_model_prices(
+        self,
+        model: str | None,
+    ) -> tuple[float, float]:
+        if not model:
+            return (
+                self.input_price_per_million,
+                self.output_price_per_million,
+            )
+
+        prefix = "GEMINI_PRICE_" + model.upper().replace("-", "_")
+        input_price = self._get_price(
+            env_name=f"{prefix}_INPUT_PER_MILLION",
+            default=self.input_price_per_million,
+            explicit_value=None,
+        )
+        output_price = self._get_price(
+            env_name=f"{prefix}_OUTPUT_PER_MILLION",
+            default=self.output_price_per_million,
+            explicit_value=None,
+        )
+        return input_price, output_price
 
     # ========================================================
     # Statistics

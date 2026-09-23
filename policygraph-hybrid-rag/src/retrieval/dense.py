@@ -605,6 +605,7 @@ def dense_search(
     query: str,
     top_k: int = 10,
     include_prompt_injection: bool = False,
+    query_embedding: list[float] | None = None,
 ) -> list[tuple[dict[str, Any], float]]:
     """
     Perform dense semantic retrieval using:
@@ -633,9 +634,10 @@ def dense_search(
             "top_k must be greater than 0."
         )
 
-    query_embedding = embed_text(
-        query
-    )
+    if query_embedding is None:
+        query_embedding = embed_text(
+            query
+        )
 
     query_vector = embedding_to_vector(
         query_embedding

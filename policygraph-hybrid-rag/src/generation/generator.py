@@ -6,6 +6,8 @@ from typing import Any
 from dotenv import load_dotenv
 from google import genai
 
+from src.api.gemini_model_fallback import generate_with_fallback
+
 
 load_dotenv()
 
@@ -221,7 +223,7 @@ def generate(
     question: str,
     documents: list[dict[str, Any] | str],
     client: genai.Client,
-) -> tuple[str, Any]:
+) -> tuple[str, Any, str]:
     """
     Generate a grounded answer using Gemini.
 
@@ -231,6 +233,9 @@ def generate(
 
         usage_metadata:
             Gemini usage metadata returned by the API.
+
+        selected_model:
+            Model that successfully generated the answer.
     """
 
     prompt = build_prompt(
@@ -238,9 +243,14 @@ def generate(
         documents=documents,
     )
 
-    response = client.models.generate_content(
-        model=MODEL_NAME,
+    response, selected_model = generate_with_fallback(
+        client=client,
         contents=prompt,
+        configured_model=MODEL_NAME,
+    )
+
+    print(
+        f"Gemini generation model: {selected_model}"
     )
 
     answer = (
@@ -261,6 +271,7 @@ def generate(
     return (
         answer,
         usage_metadata,
+        selected_model,
     )
 
 
@@ -288,7 +299,7 @@ if __name__ == "__main__":
         }
     ]
 
-    answer, usage = generate(
+    answer, usage, selected_model = generate(
         question=question,
         documents=documents,
         client=client,
@@ -305,3 +316,4 @@ if __name__ == "__main__":
     )
 
     print(usage)
+    print(selected_model)

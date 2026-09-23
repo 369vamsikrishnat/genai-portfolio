@@ -8,6 +8,12 @@ RUN apt-get update \
         tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
+# Create non-root runtime user
+RUN useradd -m appuser
+
+# Ensure Hugging Face cache lives under /app so it remains available after USER appuser.
+ENV HF_HOME=/app/.cache/huggingface
+
 # Copy application
 COPY . .
 
@@ -28,6 +34,13 @@ RUN pip install --no-cache-dir \
     pymupdf \
     pytesseract \
     python-dotenv
+
+# Warm both embedding models into the image to reduce Cloud Run cold starts
+RUN python -c "from sentence_transformers import SentenceTransformer, CrossEncoder; SentenceTransformer('BAAI/bge-base-en-v1.5'); CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')"
+
+RUN chown -R appuser /app
+
+USER appuser
 
 EXPOSE 8000
 EXPOSE 8501
