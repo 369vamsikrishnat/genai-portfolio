@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install pinned dependencies and the package
+        run: |
+          pip install -r requirements.lock
+          pip install --no-deps -e .
+      - name: Tests
+        run: python -m pytest
+      - name: Dependency audit
+        run: pip-audit -r requirements.lock --no-deps --disable-pip
+        continue-on-error: true
+      - name: Compose file is valid
+        run: docker compose config -q
+        env:
+          GEMINI_MODEL: placeholder

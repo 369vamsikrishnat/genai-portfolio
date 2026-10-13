@@ -1,0 +1,11 @@
+.git
+.github
+.venv
+.env
+.pytest_cache
+__pycache__
+*.egg-info
+eval/results
+repomix-audit.md
+docs
+tests
