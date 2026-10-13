@@ -1,3 +1,3 @@
-from .graph import MergeGuardState, RiskFinding, analyze_code_risk, build_graph
+"""MergeGuard: multi-agent pull-request review workflow."""
 
-__all__ = ["MergeGuardState", "RiskFinding", "analyze_code_risk", "build_graph"]
+__version__ = "0.9.0"

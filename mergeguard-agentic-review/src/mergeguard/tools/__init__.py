@@ -1,4 +1,4 @@
 from .github_client import GitHubClient
-from .sandbox import SandboxConfig, SandboxedTestRunner, TestResult
+from .sandbox_client import SandboxedTestRunner, TestResult
 
-__all__ = ["GitHubClient", "SandboxConfig", "SandboxedTestRunner", "TestResult"]
+__all__ = ["GitHubClient", "SandboxedTestRunner", "TestResult"]
