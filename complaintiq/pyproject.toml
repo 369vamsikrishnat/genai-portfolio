@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "complaintiq"
+version = "0.1.0"
+description = "Complaint triage, emerging-issue detection and cited response drafting over the CFPB complaint database"
+requires-python = ">=3.10"
+dependencies = ["numpy", "pandas", "scikit-learn>=1.3", "scipy", "joblib", "requests"]
+
+[project.optional-dependencies]
+data = ["duckdb>=1.0", "pyarrow"]
+embed = ["sentence-transformers"]
+serve = ["fastapi", "uvicorn[standard]", "pydantic>=2", "streamlit"]
+faiss = ["faiss-cpu"]
+dev = ["pytest", "ruff", "locust"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = ["E501"]

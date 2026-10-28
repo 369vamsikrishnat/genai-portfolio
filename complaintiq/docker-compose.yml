@@ -1,0 +1,20 @@
+services:
+  api:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      CIQ_APP: api
+      CIQ_LLM: ${CIQ_LLM:-mock}
+      CIQ_API_KEY: ${CIQ_API_KEY:-}
+      CIQ_RATE_LIMIT: ${CIQ_RATE_LIMIT:-60}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    volumes: ["artifacts:/app/artifacts"]
+  ui:
+    build: .
+    ports: ["7860:7860"]
+    environment:
+      CIQ_APP: ui
+      CIQ_LLM: ${CIQ_LLM:-mock}
+    volumes: ["artifacts:/app/artifacts"]
+volumes:
+  artifacts: {}
