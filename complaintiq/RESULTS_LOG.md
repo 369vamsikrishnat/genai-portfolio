@@ -56,3 +56,13 @@
 - `pyproject.toml` now specifies `scikit-learn==1.9.1`.
 - Installed version verified: `1.9.1`.
 - Project requirement and active environment match.
+
+## Phase 1 — Data quality and privacy review (2026-11-04)
+
+- Deterministic sample: 200,000 rows; duplicate complaint IDs: 0.
+- Template repetition: 34.8%; 130,429 distinct narratives in the sample.
+- Post-redaction PII pattern checks: 0 matches across SSN, card, email, phone and number patterns.
+- Manual privacy review: 100 template-deduplicated narratives (seed 42); 0 clearly visible unmasked identifiers. This is a spot-check, not proof of zero PII across the full dataset.
+- Ingestion join: 2,004,605 joined rows; 31 unmatched archive IDs; narrative coverage of main dataset: 14.06%.
+- Distinct narrative hashes in joined data: 1,056,264.
+- Report: `docs/data_quality.md`; manual review: `results/privacy_review_100.csv`.
