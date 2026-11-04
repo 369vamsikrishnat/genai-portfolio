@@ -66,3 +66,39 @@
 - Ingestion join: 2,004,605 joined rows; 31 unmatched archive IDs; narrative coverage of main dataset: 14.06%.
 - Distinct narrative hashes in joined data: 1,056,264.
 - Report: `docs/data_quality.md`; manual review: `results/privacy_review_100.csv`.
+
+## Phase 2 — Frozen hashing classifier (2026-11-04)
+
+- Build: `python -m complaintiq build --src data/processed --out artifacts/complaintiq_frozen --since 2024 --sample 100000 --embedder hashing --test-cutoff 2025-09-24 --classifier-only`
+- Evaluation: `$env:CIQ_ARTIFACTS_DIR="artifacts/complaintiq_frozen"; python -m complaintiq eval-classifier`
+- Frozen test IDs: 229,940; exact match with Phase 0 frozen set.
+- Training rows: 100,000
+- Macro-F1: 0.4909
+- Weighted-F1: 0.6449
+- Accuracy: 0.6182
+- Expected calibration error: 0.0105
+- Output: `results/classifier_metrics.json`, `results/classifier_metrics.md`
+
+### Full-training hashing benchmark — 2026-11-04
+
+- Artifact: `artifacts/complaintiq_full_hashing`
+- Training rows: 826,324
+- Frozen test rows: 229,940 (IDs match Phase 0)
+- Macro-F1: 0.5131
+- Weighted-F1: 0.6602
+- Accuracy: 0.6355
+- Majority baseline: 0.2870
+- Expected calibration error: 0.0432
+- Embed time: 265.65 seconds
+- Evaluation: `python -m complaintiq eval-classifier`
+- Outputs: `results/classifier_metrics.json`, `results/classifier_metrics.md`
+
+## Phase 5 — Risk definition freeze (2026-11-04)
+
+- Definition: `RISK_DEFINITION.md`
+- Six explicit risk triggers and negative-label rules documented.
+- Ten consistency anchors documented; all outside the original 250-row labelled dataset.
+- Legal escalation clarified: stated or conditional intent counts; merely noting that legal action may be possible does not.
+- Anchor 10336024 confirmed positive (1); replacement legal-language-only negative anchor: 10380544 (0).
+- Labels and risk rules unchanged.
+- Evaluation limitation documented: monitor development-set positive rate; review if above approximately 30%.
