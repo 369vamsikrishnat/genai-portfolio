@@ -26,11 +26,11 @@ Commits: `74fac87`, `b3d3732`
 
 - [ ] 3.1 Fix embedding speed; complete 2,000-narrative timing test
 - [x] 3.2 Make embedding resumable if processing takes over one hour (existing implementation inspected; runtime resume test pending)
-- [ ] 3.3 Reproduce hashing baseline under frozen cutoff
-- [ ] 3.4 Run full-data hashing classifier; save artifact, metrics and test-ID hash
-- [ ] 3.5 Run embedding model on the same sample and test set
-- [ ] 3.6 Create `docs/classifier_comparison.md`
-- [ ] 3.7 Select confidence threshold on validation data, not test data
+- [x] 3.3 Reproduce hashing baseline under frozen cutoff (existing artifact and sorted test-ID hash verified)
+- [x] 3.4 Full-data hashing artifact, metrics and test-ID hash verified (existing outputs reused)
+- [x] 3.5 Run embedding model on the same sample and test set
+- [x] 3.6 Create `docs/classifier_comparison.md`
+- [x] 3.7 Select confidence threshold on validation data, not test data (stratified 80/20 training split; selected 0.70; validation coverage 62.5%, covered accuracy 87.6%; temporal test untouched)
 
 ## Phase 4: Retrieval
 

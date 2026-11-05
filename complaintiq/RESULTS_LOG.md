@@ -165,3 +165,52 @@
 - Saves progress and validates model/data fingerprint, row count, dimensions and chunk size before resuming.
 - Moves completed vectors into `vectors.npy` and removes the progress file.
 - Implementation verified by code inspection; interruption/resume execution test remains outstanding.
+
+
+### Task 3.3 ? Reproduce hashing baseline under frozen cutoff (2026-11-05)
+
+- Reused existing full-data hashing artifact: `artifacts/complaintiq_full_hashing`.
+- Frozen cutoff: 2025-09-24; training rows: 826,324; test rows: 229,940.
+- Test IDs: 229,940 unique IDs.
+- Sorted test-ID SHA256 matches manifest: `4bfc116b97595b9fbe9994ecac3b66d9926c6955907620c6f658f61b88f35b4a`.
+- Existing evaluation: macro-F1 0.5131; weighted-F1 0.6602; accuracy 0.6355.
+- Existing artifact and evaluation metadata agree on the frozen temporal split. No rebuild or evaluation rerun.
+
+
+### Task 3.4 ? Full-data hashing classifier (2026-11-05)
+
+- Reused existing `artifacts/complaintiq_full_hashing` artifact; no retraining.
+- Verified classifier (`clf.joblib`), metadata (`meta.joblib`), vectors (`vectors.npy`), manifest and test IDs are present.
+- Training rows: 826,324; test rows: 229,940; frozen cutoff: 2025-09-24.
+- Existing evaluation metrics: macro-F1 0.5131, weighted-F1 0.6602, accuracy 0.6355.
+- Verified sorted test-ID SHA256 against manifest.
+
+
+### Task 3.5 ? MiniLM embedding evaluation (2026-11-05)
+
+- Built full temporal artifact using MiniLM: `artifacts/complaintiq_full_minilm`.
+- Training: 100,000 complaints; temporal test: 229,940 complaints.
+- Test cutoff: 2025-09-24; test-ID SHA256 matches frozen manifest.
+- Embedding dimensions: 384.
+- Test macro-F1: 0.6321.
+- Embedding runtime: 20,146.8 seconds (~5.60 hours).
+- BM25 build: 46.82 seconds.
+- All 329,940 embeddings completed successfully; no rerun required.
+- Note: compare against hashing with the same 100k training sample before claiming a model improvement.
+
+
+### Task 3.6 ? Classifier comparison (2026-11-05)
+
+- Created `docs/classifier_comparison.md`.
+- Compared 100k hashing (macro-F1 0.4909) against MiniLM (0.6321).
+- Both use 100,000 training rows, 229,940 test rows, cutoff 2025-09-24 and identical test-ID SHA256.
+- MiniLM improvement: +0.1412 absolute macro-F1 (~28.8% relative).
+
+### Task 3.7 ? Confidence threshold validation (2026-11-05)
+
+- Created `results/confidence_threshold_validation_v1.json` and `results/confidence_threshold_validation_v1.md`.
+- Reused existing MiniLM embeddings; stratified 80/20 split of the 100,000 training rows (80,000 fit / 20,000 validation; random state 42).
+- Selected initial operating threshold: **0.70**.
+- Validation coverage: **62.5%**; accuracy among covered predictions: **87.6%**; escalation rate: **37.5%**.
+- Frozen temporal test set was not used for threshold selection.
+- Decision is provisional; validation is a random training-period split, not a later-period temporal validation.

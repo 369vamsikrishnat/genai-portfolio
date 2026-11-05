@@ -1,0 +1,93 @@
+{
+  "artifact": "artifacts\\complaintiq_full_minilm",
+  "split": "stratified 80/20 of training rows only",
+  "random_state": 42,
+  "n_fit": 80000,
+  "n_validation": 20000,
+  "temporal_test_used": false,
+  "validation_accuracy_all": 0.76215,
+  "validation_macro_f1_all": 0.5856237122735568,
+  "thresholds": [
+    {
+      "threshold": 0.5,
+      "validation_coverage": 0.8439,
+      "accuracy_on_covered": 0.8199431212228937,
+      "macro_f1_all_validation": 0.5496415145842029,
+      "escalation_rate": 0.1561,
+      "n_covered": 16878,
+      "n_escalated": 3122
+    },
+    {
+      "threshold": 0.55,
+      "validation_coverage": 0.79255,
+      "accuracy_on_covered": 0.8361617563560658,
+      "macro_f1_all_validation": 0.5510440633648132,
+      "escalation_rate": 0.20745,
+      "n_covered": 15851,
+      "n_escalated": 4149
+    },
+    {
+      "threshold": 0.6,
+      "validation_coverage": 0.74055,
+      "accuracy_on_covered": 0.8501114036864492,
+      "macro_f1_all_validation": 0.5483805815179279,
+      "escalation_rate": 0.25945,
+      "n_covered": 14811,
+      "n_escalated": 5189
+    },
+    {
+      "threshold": 0.65,
+      "validation_coverage": 0.6861,
+      "accuracy_on_covered": 0.8635038624107273,
+      "macro_f1_all_validation": 0.5432806323709722,
+      "escalation_rate": 0.3139,
+      "n_covered": 13722,
+      "n_escalated": 6278
+    },
+    {
+      "threshold": 0.7,
+      "validation_coverage": 0.6255,
+      "accuracy_on_covered": 0.8759392486011192,
+      "macro_f1_all_validation": 0.5353617867852783,
+      "escalation_rate": 0.3745,
+      "n_covered": 12510,
+      "n_escalated": 7490
+    },
+    {
+      "threshold": 0.75,
+      "validation_coverage": 0.55915,
+      "accuracy_on_covered": 0.8867924528301887,
+      "macro_f1_all_validation": 0.5229910126504769,
+      "escalation_rate": 0.44085,
+      "n_covered": 11183,
+      "n_escalated": 8817
+    },
+    {
+      "threshold": 0.8,
+      "validation_coverage": 0.48655,
+      "accuracy_on_covered": 0.8994964546295344,
+      "macro_f1_all_validation": 0.505393895935096,
+      "escalation_rate": 0.51345,
+      "n_covered": 9731,
+      "n_escalated": 10269
+    },
+    {
+      "threshold": 0.85,
+      "validation_coverage": 0.40345,
+      "accuracy_on_covered": 0.9115131986615442,
+      "macro_f1_all_validation": 0.48129110071113446,
+      "escalation_rate": 0.59655,
+      "n_covered": 8069,
+      "n_escalated": 11931
+    },
+    {
+      "threshold": 0.9,
+      "validation_coverage": 0.29945,
+      "accuracy_on_covered": 0.9158457171481048,
+      "macro_f1_all_validation": 0.43219703911510293,
+      "escalation_rate": 0.70055,
+      "n_covered": 5989,
+      "n_escalated": 14011
+    }
+  ]
+}
