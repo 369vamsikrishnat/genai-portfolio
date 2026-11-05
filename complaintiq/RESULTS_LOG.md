@@ -102,3 +102,33 @@
 - Anchor 10336024 confirmed positive (1); replacement legal-language-only negative anchor: 10380544 (0).
 - Labels and risk rules unchanged.
 - Evaluation limitation documented: monitor development-set positive rate; review if above approximately 30%.
+
+### Task 2.3 — Current risk-rule baseline (2026-11-05)
+
+- Command: `python -c "import json; from pathlib import Path; from complaintiq.evals.risk import score_rules; p=Path('results/risk_dev_eval_v0.json'); p.write_text(json.dumps(score_rules('results/risk_dev_labels_300_v1.csv'), indent=2)+'\n', encoding='utf-8')"`
+- Frozen development labels: 300 rows; 55 positives.
+- Precision: 0.848; recall: 0.509; F1: 0.636; accuracy: 0.893.
+- Confusion counts: TP 28; FP 5; FN 27.
+- Output: `results/risk_dev_eval_v0.json`
+- Verification: saved JSON metrics independently read back and matched.
+
+### Task 2.4 — Risk rule error analysis (2026-11-05)
+
+- Dataset: `results/risk_dev_labels_300_v1.csv` (300 frozen labels).
+- Baseline: precision 0.848; recall 0.509; F1 0.636; TP 28; FP 5; FN 27.
+- Reviewed all 32 current prediction errors and documented false-positive and false-negative patterns.
+- Main improvement candidate: targeted identity-theft rule refinement without weakening Trigger 4.
+- No labels, rules, definitions, or evaluation outputs changed.
+- Output: `results/risk_error_analysis_v0.md`
+
+### Task 2.5 — Freeze contextual risk rules v1 (2026-11-05)
+
+- Decision: freeze the existing context-aware rules without further edits.
+- Source: `src/complaintiq/risk.py`
+- Frozen development baseline: 300 labels; 55 positives.
+- Precision: 0.848; recall: 0.509; F1: 0.636; accuracy: 0.893.
+- Confusion counts: TP 28; FP 5; FN 27.
+- Verified `risk_dev_eval_v0.json` and `risk_rules.json` contain matching metrics.
+- Known limitation: recall remains low; identity-theft and legal-threat misses are documented in the error-analysis report.
+- No evaluation rerun.
+- Output: `results/risk_dev_eval_v0.json`; error analysis: `results/risk_error_analysis_v0.md`
