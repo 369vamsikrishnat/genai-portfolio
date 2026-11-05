@@ -148,3 +148,20 @@
 - Confusion counts: TP 10; FP 1; FN 50; TN 189.
 - Test recall is substantially below development recall (0.509); rules remain unchanged.
 - Output: `results/risk_flags_report_v1.md`; metrics: `results/risk_test_eval_v1.json`
+
+
+### Task 3.1 ? Embedding speed benchmark (2026-11-05)
+
+- Set SentenceTransformer maximum sequence length to 256.
+- BGE-small: 2,000 narratives; model load 66.04s; embedding 204.29s; 9.79 rows/sec; projected 100k runtime 2.84 hours.
+- MiniLM: 2,000 narratives; model load 19.05s; embedding 101.82s; 19.64 rows/sec; projected 100k runtime 1.41 hours.
+- Both CPU models exceed the one-hour target. Local CUDA is unavailable; Kaggle GPU required.
+- No full embedding build launched.
+
+### Task 3.2 ? Resumable embedding implementation
+
+- Verified existing `_encode_resumable()` in `src/complaintiq/pipeline.py`.
+- Writes durable 2,000-row chunks to a memory-mapped NumPy array.
+- Saves progress and validates model/data fingerprint, row count, dimensions and chunk size before resuming.
+- Moves completed vectors into `vectors.npy` and removes the progress file.
+- Implementation verified by code inspection; interruption/resume execution test remains outstanding.
