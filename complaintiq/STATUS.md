@@ -7,5 +7,5 @@
 - [x] 2.3 Score the current rules against frozen labels
 - [x] 2.4 Error analysis
 - [x] 2.5 Rule edits and freeze
-- [ ] 2.6 Label fresh test set
-- [ ] 2.7 Write risk flags report
+- [x] 2.6 Label fresh test set
+- [x] 2.7 Write risk flags report

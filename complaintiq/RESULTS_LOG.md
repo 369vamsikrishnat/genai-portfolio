@@ -132,3 +132,19 @@
 - Known limitation: recall remains low; identity-theft and legal-threat misses are documented in the error-analysis report.
 - No evaluation rerun.
 - Output: `results/risk_dev_eval_v0.json`; error analysis: `results/risk_error_analysis_v0.md`
+
+### Task 2.6 ? Label fresh temporal test set (2026-11-05)
+
+- Completed and validated 250 independent temporal-holdout annotations.
+- Labels: 60 positive; 190 negative.
+- Complaint IDs and narratives preserved; severity left blank; positive or uncertain cases have notes.
+- Sample date range: 2025-09-24 to 2026-07-14.
+- Output: `results/risk_test_labels_250_v1.csv`
+
+### Task 2.7 ? Risk flags temporal test report (2026-11-05)
+
+- Evaluated frozen contextual rules v1 against the 250 labelled temporal test complaints.
+- Precision: 0.909; recall: 0.167; F1: 0.282; accuracy: 0.796.
+- Confusion counts: TP 10; FP 1; FN 50; TN 189.
+- Test recall is substantially below development recall (0.509); rules remain unchanged.
+- Output: `results/risk_flags_report_v1.md`; metrics: `results/risk_test_eval_v1.json`
