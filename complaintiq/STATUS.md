@@ -1,10 +1,10 @@
-ï»¿# ComplaintIQ â€” Project Status
+# ComplaintIQ — Project Status
 
 ## Phase 0: Setup
 
 Commits: `74fac87`, `b3d3732`
 
-- [ ] 0.1 Clean the repo â€” verify no sensitive paths, data, artifacts or `.env` files are tracked.
+- [ ] 0.1 Clean the repo — verify no sensitive paths, data, artifacts or `.env` files are tracked.
 
 ## Phase 1: Data
 
@@ -15,12 +15,12 @@ Commits: `74fac87`, `b3d3732`
 ## Phase 2: Risk Flags
 
 - [x] 2.1 Label the 300 development rows
-- [x] 2.2 Freeze the labels â€” commit `8cefcda`
+- [x] 2.2 Freeze the labels — commit `8cefcda`
 - [x] 2.3 Score current rules against frozen labels
 - [x] 2.4 Error analysis
-- [x] 2.5 Contextual rule edits and freeze â€” commit `6507f37`
+- [x] 2.5 Contextual rule edits and freeze — commit `6507f37`
 - [x] 2.6 Label fresh temporal test set (250 rows)
-- [x] 2.7 Evaluate frozen rules and write risk flags report â€” commit `9aa180a`
+- [x] 2.7 Evaluate frozen rules and write risk flags report — commit `9aa180a`
 
 ## Phase 3: Classifier Comparison
 
@@ -34,7 +34,7 @@ Commits: `74fac87`, `b3d3732`
 
 ## Phase 4: Retrieval
 
-- [ ] 4.1 Confirm index uses deduplicated narratives and evaluation excludes same-hash matches
+- [x] 4.1 Confirm index uses deduplicated narratives and evaluation excludes same-hash matches
 - [ ] 4.2 Run BM25, dense, RRF and RRF with real cross-encoder ablation
 - [ ] 4.3 Review 50 query-to-top-1 pairs and record relevance percentage
 - [ ] 4.4 Write `docs/ablation.md` and identify the winner

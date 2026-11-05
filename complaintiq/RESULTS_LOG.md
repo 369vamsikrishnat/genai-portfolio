@@ -214,3 +214,10 @@
 - Validation coverage: **62.5%**; accuracy among covered predictions: **87.6%**; escalation rate: **37.5%**.
 - Frozen temporal test set was not used for threshold selection.
 - Decision is provisional; validation is a random training-period split, not a later-period temporal validation.
+
+### Task 4.1 - Retrieval leakage controls (2026-11-05)
+
+- Verified `src/complaintiq/evals/retrieval.py` uses training-split documents only and removes duplicate normalized narrative templates from the index.
+- Enforces a strict temporal holdout; excludes shared boundary-date rows, cross-split template matches, and duplicate test templates.
+- Evaluation evidence: 53,883 indexed documents; 13,392 strictly later test rows before template exclusions; 300 sampled queries.
+- Relevance remains a weak product/issue-match proxy, not human-judged precedent relevance.
