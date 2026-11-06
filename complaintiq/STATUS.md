@@ -35,9 +35,9 @@ Commits: `74fac87`, `b3d3732`
 ## Phase 4: Retrieval
 
 - [x] 4.1 Confirm index uses deduplicated narratives and evaluation excludes same-hash matches
-- [ ] 4.2 Run BM25, dense, RRF and RRF with real cross-encoder ablation
-- [ ] 4.3 Review 50 query-to-top-1 pairs and record relevance percentage
-- [ ] 4.4 Write `docs/ablation.md` and identify the winner
+- [x] 4.2 Run BM25, dense, RRF and RRF with real cross-encoder ablation
+- [x] 4.3 Review 50 query-to-top-1 pairs and record relevance percentage
+- [x] 4.4 Write `docs/ablation.md` and identify the winner
 
 ## Phase 5: Cascade with a Real LLM
 

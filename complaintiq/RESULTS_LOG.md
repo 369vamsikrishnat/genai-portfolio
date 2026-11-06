@@ -221,3 +221,30 @@
 - Enforces a strict temporal holdout; excludes shared boundary-date rows, cross-split template matches, and duplicate test templates.
 - Evaluation evidence: 53,883 indexed documents; 13,392 strictly later test rows before template exclusions; 300 sampled queries.
 - Relevance remains a weak product/issue-match proxy, not human-judged precedent relevance.
+
+### Task 4.2 - Retrieval cross-encoder ablation (2026-11-06)
+
+- Evaluated real `cross-encoder/ms-marco-MiniLM-L-6-v2` on RRF top-50 candidates.
+- Reused the exact 300 temporal queries; query-ID SHA256 matched the baseline.
+- Preserved original BM25, dense and RRF metrics; reranker-only output saved separately.
+- Created `docs/retrieval_cross_encoder_ablation.md`.
+- RRF + cross-encoder: Hit@10 0.8067, nDCG@10 0.3458; RRF: 0.7700 and 0.3154.
+- CPU search p50 increased from 13.711 ms to 9,462.421 ms; retain RRF as practical CPU default.
+- Weak product/issue proxy labels are not human-judged precedent relevance.
+
+### Task 4.3 - Retrieval top-1 relevance review (2026-11-07)
+
+- Reviewed 50 RRF query-to-top-1 pairs from the frozen temporal query sample.
+- Copilot-assisted judgments: 36 relevant, 10 not relevant, 4 uncertain.
+- Decisive human relevance: 78.26% (36/46); uncertain cases excluded.
+- All 50 rows have reviewer notes; original review sample preserved.
+- Created `docs/retrieval_human_review_v1.md`.
+- Assessment is assisted, not independent expert validation.
+
+### Task 4.4 - Retrieval ablation decision (2026-11-07)
+
+- Consolidated BM25, dense, RRF and real cross-encoder results in `docs/ablation.md`.
+- Selected RRF as the practical CPU default; BM25 remains the low-latency baseline.
+- Cross-encoder improves weak-proxy ranking metrics but costs approximately 690.1x RRF search p50 latency.
+- Included the 50-pair Copilot-assisted review: 36 yes, 10 no, 4 uncertain; 78.26% among decisive judgments.
+- Documented temporal leakage controls, proxy-label limitations and CPU-only latency caveats.
