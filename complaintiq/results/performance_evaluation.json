@@ -1,0 +1,564 @@
+{
+  "evaluation_type": "real_artifact_performance_benchmark",
+  "generated_at": "2026-10-30T16:32:36Z",
+  "seed": 0,
+  "artifact": {
+    "data_source_type": "real_cfpb",
+    "rows": 67452,
+    "training_rows": 53961,
+    "test_rows": 13491,
+    "dimensions": 384,
+    "embedder": "hashing",
+    "artifact_version": "2026-10-30T17:53:53"
+  },
+  "configuration": {
+    "source_path": "F:\\ai\\genai-portfolio\\complaintiq\\data\\processed",
+    "workload_sizes": [
+      1000,
+      2500,
+      5000
+    ],
+    "ingestion_sizes": [
+      100,
+      500
+    ],
+    "n_queries": 50,
+    "api_requests_per_worker_level": 10,
+    "concurrency_levels": [
+      1,
+      2
+    ],
+    "classifier_batch_timing": {
+      "warmup_batches": 1,
+      "measured_batches": 25
+    },
+    "quantization_k": 10,
+    "retrieval_modes": [
+      "bm25",
+      "dense",
+      "rrf",
+      "rrf_rerank"
+    ],
+    "replay": "monthly artifact batches; hashing embed and classifier predict",
+    "hardware": {
+      "platform": "Windows-10-10.0.19045-SP0",
+      "processor": "Intel64 Family 6 Model 142 Stepping 9, GenuineIntel",
+      "logical_cpus": 4,
+      "memory_gib": 7.88,
+      "python": "3.12.0"
+    },
+    "runtime_versions": {
+      "numpy": "2.4.3",
+      "pandas": "3.0.1",
+      "scikit_learn": "1.9.0",
+      "scipy": "1.17.1"
+    }
+  },
+  "ingestion": {
+    "method": "load_complaints from processed Parquet with deterministic sample limits",
+    "source_rows_returned": [
+      {
+        "requested_rows": 100,
+        "loaded_rows": 100,
+        "seconds": 28.4261,
+        "rows_per_second": 3.52
+      },
+      {
+        "requested_rows": 500,
+        "loaded_rows": 500,
+        "seconds": 23.968,
+        "rows_per_second": 20.86
+      }
+    ]
+  },
+  "classification": {
+    "batch_workloads": [
+      {
+        "rows": 1000,
+        "batch_latency_ms": {
+          "p50": 2.167,
+          "p95": 3.681,
+          "p99": 5.013
+        },
+        "mean_batch_latency_ms": 2.516,
+        "rows_per_second": 397475.24,
+        "process_memory_after_mb": {
+          "working_set_mb": 165.1,
+          "peak_working_set_mb": 1224.25,
+          "private_bytes_mb": 583.21
+        }
+      },
+      {
+        "rows": 2500,
+        "batch_latency_ms": {
+          "p50": 5.461,
+          "p95": 8.52,
+          "p99": 9.077
+        },
+        "mean_batch_latency_ms": 5.784,
+        "rows_per_second": 432213.08,
+        "process_memory_after_mb": {
+          "working_set_mb": 168.92,
+          "peak_working_set_mb": 1224.25,
+          "private_bytes_mb": 583.25
+        }
+      },
+      {
+        "rows": 5000,
+        "batch_latency_ms": {
+          "p50": 11.118,
+          "p95": 44.61,
+          "p99": 57.903
+        },
+        "mean_batch_latency_ms": 16.594,
+        "rows_per_second": 301315.76,
+        "process_memory_after_mb": {
+          "working_set_mb": 175.18,
+          "peak_working_set_mb": 1224.25,
+          "private_bytes_mb": 583.48
+        }
+      }
+    ],
+    "single_record_latency_ms": {
+      "p50": 0.209,
+      "p95": 0.511,
+      "p99": 0.735
+    }
+  },
+  "retrieval": [
+    {
+      "index_rows": 1000,
+      "index_build_seconds": 0.356,
+      "query_latency_ms": {
+        "p50": 1.205,
+        "p95": 2.682,
+        "p99": 2.873
+      },
+      "queries_per_second": 724.59,
+      "mode": "bm25",
+      "query_source": "temporal artifact test split",
+      "n_queries": 50
+    },
+    {
+      "index_rows": 1000,
+      "index_build_seconds": 0.356,
+      "query_latency_ms": {
+        "p50": 2.144,
+        "p95": 6.377,
+        "p99": 10.805
+      },
+      "queries_per_second": 327.71,
+      "mode": "dense",
+      "query_source": "temporal artifact test split",
+      "n_queries": 50
+    },
+    {
+      "index_rows": 1000,
+      "index_build_seconds": 0.356,
+      "query_latency_ms": {
+        "p50": 6.755,
+        "p95": 28.579,
+        "p99": 36.318
+      },
+      "queries_per_second": 112.58,
+      "mode": "rrf",
+      "query_source": "temporal artifact test split",
+      "n_queries": 50
+    },
+    {
+      "index_rows": 1000,
+      "index_build_seconds": 0.356,
+      "query_latency_ms": {
+        "p50": 13.59,
+        "p95": 22.019,
+        "p99": 29.602
+      },
+      "queries_per_second": 72.44,
+      "mode": "rrf_rerank",
+      "query_source": "temporal artifact test split",
+      "n_queries": 50
+    },
+    {
+      "index_rows": 2500,
+      "index_build_seconds": 1.14,
+      "query_latency_ms": {
+        "p50": 1.467,
+        "p95": 6.753,
+        "p99": 9.221
+      },
+      "queries_per_second": 412.98,
+      "mode": "bm25",
+      "query_source": "temporal artifact test split",
+      "n_queries": 50
+    },
+    {
+      "index_rows": 2500,
+      "index_build_seconds": 1.14,
+      "query_latency_ms": {
+        "p50": 2.788,
+        "p95": 8.99,
+        "p99": 10.836
+      },
+      "queries_per_second": 253.37,
+      "mode": "dense",
+      "query_source": "temporal artifact test split",
+      "n_queries": 50
+    },
+    {
+      "index_rows": 2500,
+      "index_build_seconds": 1.14,
+      "query_latency_ms": {
+        "p50": 2.5,
+        "p95": 5.764,
+        "p99": 6.96
+      },
+      "queries_per_second": 321.8,
+      "mode": "rrf",
+      "query_source": "temporal artifact test split",
+      "n_queries": 50
+    },
+    {
+      "index_rows": 2500,
+      "index_build_seconds": 1.14,
+      "query_latency_ms": {
+        "p50": 19.045,
+        "p95": 32.86,
+        "p99": 46.279
+      },
+      "queries_per_second": 48.99,
+      "mode": "rrf_rerank",
+      "query_source": "temporal artifact test split",
+      "n_queries": 50
+    },
+    {
+      "index_rows": 5000,
+      "index_build_seconds": 1.625,
+      "query_latency_ms": {
+        "p50": 1.968,
+        "p95": 10.482,
+        "p99": 12.04
+      },
+      "queries_per_second": 323.22,
+      "mode": "bm25",
+      "query_source": "temporal artifact test split",
+      "n_queries": 50
+    },
+    {
+      "index_rows": 5000,
+      "index_build_seconds": 1.625,
+      "query_latency_ms": {
+        "p50": 7.38,
+        "p95": 17.701,
+        "p99": 19.509
+      },
+      "queries_per_second": 123.46,
+      "mode": "dense",
+      "query_source": "temporal artifact test split",
+      "n_queries": 50
+    },
+    {
+      "index_rows": 5000,
+      "index_build_seconds": 1.625,
+      "query_latency_ms": {
+        "p50": 6.71,
+        "p95": 27.792,
+        "p99": 42.595
+      },
+      "queries_per_second": 90.42,
+      "mode": "rrf",
+      "query_source": "temporal artifact test split",
+      "n_queries": 50
+    },
+    {
+      "index_rows": 5000,
+      "index_build_seconds": 1.625,
+      "query_latency_ms": {
+        "p50": 24.595,
+        "p95": 96.777,
+        "p99": 110.965
+      },
+      "queries_per_second": 29.0,
+      "mode": "rrf_rerank",
+      "query_source": "temporal artifact test split",
+      "n_queries": 50
+    }
+  ],
+  "quantization": [
+    {
+      "n": 1000,
+      "dim": 384,
+      "memory_mb": {
+        "float32": 1.46,
+        "int8": 0.37,
+        "binary": 0.05,
+        "binary+int8_rescore": 0.41
+      },
+      "float32": {
+        "recall@k": 1.0,
+        "latency_ms": {
+          "p50": 0.234,
+          "p95": 1.115,
+          "p99": 5.198
+        },
+        "build_s": 0.0
+      },
+      "int8": {
+        "recall@k": 0.964,
+        "latency_ms": {
+          "p50": 1.947,
+          "p95": 3.775,
+          "p99": 7.086
+        },
+        "build_s": 0.032
+      },
+      "binary": {
+        "recall@k": 0.102,
+        "latency_ms": {
+          "p50": 0.534,
+          "p95": 1.842,
+          "p99": 2.379
+        },
+        "build_s": 0.002
+      },
+      "binary+int8_rescore": {
+        "recall@k": 0.33,
+        "latency_ms": {
+          "p50": 0.84,
+          "p95": 4.691,
+          "p99": 6.47
+        },
+        "build_s": 0.034
+      },
+      "process_memory_after_mb": {
+        "working_set_mb": 178.12,
+        "peak_working_set_mb": 1224.25,
+        "private_bytes_mb": 584.04
+      }
+    },
+    {
+      "n": 2500,
+      "dim": 384,
+      "memory_mb": {
+        "float32": 3.66,
+        "int8": 0.92,
+        "binary": 0.11,
+        "binary+int8_rescore": 1.03
+      },
+      "float32": {
+        "recall@k": 1.0,
+        "latency_ms": {
+          "p50": 0.704,
+          "p95": 1.671,
+          "p99": 3.226
+        },
+        "build_s": 0.0
+      },
+      "int8": {
+        "recall@k": 0.948,
+        "latency_ms": {
+          "p50": 4.467,
+          "p95": 8.791,
+          "p99": 11.473
+        },
+        "build_s": 0.016
+      },
+      "binary": {
+        "recall@k": 0.086,
+        "latency_ms": {
+          "p50": 2.427,
+          "p95": 30.979,
+          "p99": 38.209
+        },
+        "build_s": 0.001
+      },
+      "binary+int8_rescore": {
+        "recall@k": 0.232,
+        "latency_ms": {
+          "p50": 2.208,
+          "p95": 12.441,
+          "p99": 20.499
+        },
+        "build_s": 0.017
+      },
+      "process_memory_after_mb": {
+        "working_set_mb": 167.87,
+        "peak_working_set_mb": 1224.25,
+        "private_bytes_mb": 587.14
+      }
+    },
+    {
+      "n": 5000,
+      "dim": 384,
+      "memory_mb": {
+        "float32": 7.32,
+        "int8": 1.83,
+        "binary": 0.23,
+        "binary+int8_rescore": 2.06
+      },
+      "float32": {
+        "recall@k": 1.0,
+        "latency_ms": {
+          "p50": 0.907,
+          "p95": 4.735,
+          "p99": 10.308
+        },
+        "build_s": 0.0
+      },
+      "int8": {
+        "recall@k": 0.936,
+        "latency_ms": {
+          "p50": 8.971,
+          "p95": 13.151,
+          "p99": 15.3
+        },
+        "build_s": 0.029
+      },
+      "binary": {
+        "recall@k": 0.076,
+        "latency_ms": {
+          "p50": 2.51,
+          "p95": 11.654,
+          "p99": 30.022
+        },
+        "build_s": 0.005
+      },
+      "binary+int8_rescore": {
+        "recall@k": 0.264,
+        "latency_ms": {
+          "p50": 2.87,
+          "p95": 15.568,
+          "p99": 18.993
+        },
+        "build_s": 0.033
+      },
+      "process_memory_after_mb": {
+        "working_set_mb": 178.73,
+        "peak_working_set_mb": 1224.25,
+        "private_bytes_mb": 593.37
+      }
+    }
+  ],
+  "replay": {
+    "records_processed": 67452,
+    "months": 28,
+    "wall_seconds": 44.1192,
+    "records_per_second": 1528.86,
+    "monthly_batch_latency_ms": {
+      "p50": 1554.753,
+      "p95": 2837.804,
+      "p99": 3045.59
+    }
+  },
+  "api": {
+    "sequential_requests": 10,
+    "sequential_wall_seconds": 0.2313,
+    "sequential_requests_per_second": 43.23,
+    "sequential_latency_ms": {
+      "p50": 18.1,
+      "p95": 46.1,
+      "p99": 59.94
+    },
+    "sequential_statuses": {
+      "200": 10
+    },
+    "concurrency": [
+      {
+        "workers": 1,
+        "requests": 10,
+        "wall_seconds": 0.3672,
+        "requests_per_second": 27.23,
+        "latency_ms": {
+          "p50": 33.536,
+          "p95": 71.51,
+          "p99": 79.781
+        },
+        "statuses": {
+          "200": 10
+        }
+      },
+      {
+        "workers": 2,
+        "requests": 20,
+        "wall_seconds": 0.3746,
+        "requests_per_second": 53.39,
+        "latency_ms": {
+          "p50": 29.249,
+          "p95": 70.764,
+          "p99": 83.594
+        },
+        "statuses": {
+          "200": 20
+        }
+      }
+    ]
+  },
+  "cost": {
+    "measured_external_spend_usd": 0.0,
+    "measured_llm_provider": "MockLLM; no external model calls",
+    "measured_api_mock_est_cost_mean_usd": 0.0,
+    "assumption_based_cost_per_escalated_triage_usd": 0.0001605,
+    "assumption_based_cost_per_1000_escalated_triages_usd": 0.1605,
+    "assumptions": {
+      "input_tokens": 94,
+      "completion_tokens": 24,
+      "price_in_per_m_usd": 0.75,
+      "price_out_per_m_usd": 3.75,
+      "draft_generation_external_llm_calls": 0,
+      "note": "Price-list scenario only; no external provider spend was measured."
+    }
+  },
+  "memory": {
+    "before_mb": {
+      "working_set_mb": 367.14,
+      "peak_working_set_mb": 368.36,
+      "private_bytes_mb": 566.25
+    },
+    "after_mb": {
+      "working_set_mb": 270.06,
+      "peak_working_set_mb": 1224.25,
+      "private_bytes_mb": 611.31
+    },
+    "vector_storage_bytes": {
+      "float32": 103606272,
+      "int8": 25901568,
+      "binary": 3237696
+    },
+    "quantized_sizes": [
+      {
+        "rows": 1000,
+        "reported_memory_mb": {
+          "float32": 1.46,
+          "int8": 0.37,
+          "binary": 0.05,
+          "binary+int8_rescore": 0.41
+        }
+      },
+      {
+        "rows": 2500,
+        "reported_memory_mb": {
+          "float32": 3.66,
+          "int8": 0.92,
+          "binary": 0.11,
+          "binary+int8_rescore": 1.03
+        }
+      },
+      {
+        "rows": 5000,
+        "reported_memory_mb": {
+          "float32": 7.32,
+          "int8": 1.83,
+          "binary": 0.23,
+          "binary+int8_rescore": 2.06
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "Benchmark ran on one local laptop, one Python process, and the sampled/deduplicated real artifact; it does not establish production capacity.",
+    "API uses TestClient and MockLLM; network, TLS, remote provider latency, and provider cost are not measured.",
+    "Workload sizes are bounded by the current temporal training index; no out-of-sample extrapolation is reported.",
+    "Process working-set memory is measured, but per-stage peak memory is not isolated.",
+    "Quantization representation sizes estimate deployable vector storage; the benchmark retains float32 and compressed forms simultaneously.",
+    "Quantized recall is top-10 overlap against exact float32 on later holdout queries, not human relevance quality."
+  ]
+}

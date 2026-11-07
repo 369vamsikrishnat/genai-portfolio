@@ -1,10 +1,18 @@
+import sqlite3
+
 import pandas as pd
 import pytest
 
 from complaintiq.audit import AuditLog, NotApproved
-from complaintiq.draft import REFUSAL, Drafter, scan_injection
+from complaintiq.draft import (
+    REFUSAL,
+    Drafter,
+    render_evidence_draft,
+    scan_injection,
+    validate_evidence_draft,
+)
 from complaintiq.embed import HashingEmbedder
-from complaintiq.llm import LLMResponse, MockLLM, Usage
+from complaintiq.llm import MockLLM
 from complaintiq.observability import Metrics, RateLimiter
 from complaintiq.retrieve import HybridRetriever, LexicalReranker
 
@@ -30,6 +38,32 @@ def test_rejected_cannot_be_sent():
     a.resolve(qid, "alice", False, "bad")
     with pytest.raises(NotApproved):
         a.mark_sent(did)
+
+
+def test_audit_schema_migrates_existing_database(tmp_path):
+    db = tmp_path / "legacy-audit.db"
+    with sqlite3.connect(db) as connection:
+        connection.executescript("""
+            CREATE TABLE decisions(
+              id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT DEFAULT (datetime('now')),
+              kind TEXT NOT NULL, input_hash TEXT NOT NULL, model TEXT, prompt_version TEXT,
+              payload TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'logged');
+            CREATE TABLE review_queue(
+              id INTEGER PRIMARY KEY AUTOINCREMENT, decision_id INTEGER NOT NULL,
+              reason TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', reviewer TEXT,
+              note TEXT, created TEXT DEFAULT (datetime('now')), resolved TEXT);
+        """)
+
+    audit = AuditLog(db)
+    decision_id = audit.log_decision(
+        "triage", "safe input", {"product": "Cards"}, request_id="migration-01",
+        artifact_version="local-model-v1",
+    )
+
+    row = audit.get(decision_id)
+    assert row["request_id"] == "migration-01"
+    assert row["artifact_version"] == "local-model-v1"
+    assert row["ts"].endswith("Z")
 
 
 DOCS = ["unauthorized charge on my credit card", "charged twice for one purchase on card",
@@ -66,18 +100,44 @@ def test_refuses_when_no_precedent():
 def test_cited_draft_ok_and_citations_valid():
     d = make_drafter(MockLLM()).draft("unauthorized charge on my credit card")
     assert d.status == "ok" and d.citations and set(d.citations) <= {11, 12, 13, 14}
+    assert set(d.citations) == {p["id"] for p in d.precedents}
+    assert "historical CFPB records" in d.text
+    assert "do not establish the facts or outcome" in d.text
+    assert "regulatory deadline" not in d.text
+    assert "opened a review" not in d.text
+    assert validate_evidence_draft(d.text, d.precedents)
 
 
-class BadCites:
-    name = "bad"
+class UnsupportedDraft:
+    name = "unsupported"
 
     def generate(self, *a, **k):
-        return LLMResponse("Refund approved per [CFPB-99999].", Usage(1, 1))
+        raise AssertionError("free-form model output must not be used in a final draft")
 
 
-def test_unknown_citation_is_rejected():
-    d = make_drafter(BadCites()).draft("unauthorized charge on my credit card")
-    assert d.status == "needs_review" and "citation" in d.reasons[0]
+def test_final_draft_does_not_use_unverified_model_prose():
+    d = make_drafter(UnsupportedDraft()).draft("unauthorized charge on my credit card")
+    assert d.status == "ok"
+    assert "Refund approved" not in d.text
+    assert validate_evidence_draft(d.text, d.precedents)
+
+
+def test_rendered_evidence_facts_are_cited_and_historical():
+    precedents = [{
+        "id": 99,
+        "product": "Mortgage",
+        "issue": "Foreclosure",
+        "outcome": "Closed with explanation",
+    }]
+
+    text = render_evidence_draft(precedents)
+
+    assert "[CFPB-99]" in text
+    assert "published company response category: Closed with explanation" in text
+    assert "historical" in text
+    assert "do not establish the facts or outcome" in text
+    assert validate_evidence_draft(text, precedents)
+    assert not validate_evidence_draft(text + " Refund approved.", precedents)
 
 
 def test_rate_limiter_and_metrics():

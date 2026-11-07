@@ -1,0 +1,46 @@
+{
+  "rows": [
+    {
+      "mode": "classifier_only",
+      "threshold": null,
+      "macro_f1": 0.45636076624768496,
+      "escalation_rate": 0.0,
+      "cost_per_1k_usd": 0.0,
+      "est_latency_ms": 0.16113333326453963
+    },
+    {
+      "mode": "llm_only",
+      "threshold": null,
+      "macro_f1": 0.6943068246313053,
+      "escalation_rate": 1.0,
+      "cost_per_1k_usd": 0.11504733333333332,
+      "est_latency_ms": 7125.098209667679
+    },
+    {
+      "mode": "cascade",
+      "threshold": 0.7,
+      "macro_f1": 0.665990313175729,
+      "escalation_rate": 0.5166666666666667,
+      "cost_per_1k_usd": 0.05695533333333333,
+      "est_latency_ms": 3681.461874994899
+    }
+  ],
+  "meta": {
+    "n": 300,
+    "llm": "gemini:gemini-3.5-flash-lite",
+    "models_used": [
+      "gemini-3-flash-preview",
+      "gemini-3.1-flash-lite",
+      "gemini-3.1-flash-lite-preview",
+      "gemini-3.5-flash-lite"
+    ],
+    "price_in": 0.3,
+    "price_out": 2.5,
+    "simulated": false,
+    "batch_size": 10,
+    "checkpoint": "results\\cascade_checkpoint.json",
+    "pricing_model": "Gemini 3.5 Flash-Lite Standard paid tier",
+    "pricing_source": "https://ai.google.dev/gemini-api/docs/pricing",
+    "pricing_accessed": "2026-11-07"
+  }
+}

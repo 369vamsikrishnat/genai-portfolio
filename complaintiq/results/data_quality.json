@@ -1,0 +1,67 @@
+{
+  "generated": "2026-11-04",
+  "sample_note": "Computed on a 200,000-row deterministic sample.",
+  "rows": 200000,
+  "date_min": "2024-04-01",
+  "date_max": "2026-07-29",
+  "duplicate_complaint_ids": 0,
+  "template_duplicate_share": 0.3479,
+  "distinct_narratives": 130429,
+  "narrative_chars": {
+    "p5": 127,
+    "p50": 671,
+    "p95": 2944,
+    "p99": 5780
+  },
+  "short_narratives_lt_50_chars": 156,
+  "missing_share": {
+    "product": 0.0,
+    "issue": 0.0,
+    "company": 0.0,
+    "company_response": 0.0
+  },
+  "n_products": 11,
+  "n_issues": 87,
+  "top_products": {
+    "Credit reporting or other personal consumer reports": 0.7174,
+    "Debt collection": 0.098,
+    "Checking or savings account": 0.0474,
+    "Credit card": 0.0441,
+    "Money transfer, virtual currency, or money service": 0.0413,
+    "Mortgage": 0.0152,
+    "Vehicle loan or lease": 0.0117,
+    "Student loan": 0.0101,
+    "Payday loan, title loan, personal loan, or advance loan": 0.0082,
+    "Prepaid card": 0.0042
+  },
+  "rows_by_year": {
+    "2024": 66251,
+    "2025": 121585,
+    "2026": 12164
+  },
+  "pii": {
+    "rows_scanned": 200000,
+    "still_matching": {
+      "ssn": 0,
+      "card": 0,
+      "email": 0,
+      "phone": 0,
+      "number": 0
+    },
+    "rows_with_redaction_tokens": 33,
+    "rows_with_cfpb_xxxx_mask": 117232
+  },
+  "totals_from_full_data": {
+    "skipped": false,
+    "rows": 2004605,
+    "sha256": "e94a24875bf31e2bd8f8d8bd0eeb4ba6932bdd594a1c19e347c7133c26371acd",
+    "seconds": 1834.9,
+    "archive_rows": 2004636,
+    "archive_distinct_ids": 2004636,
+    "archive_unmatched_ids": 31,
+    "main_rows_in_scope": 14258591,
+    "joined_rows": 2004605,
+    "narrative_coverage_of_main": 0.1406,
+    "distinct_narrative_hashes": 1056264
+  }
+}

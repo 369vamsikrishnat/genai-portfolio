@@ -23,6 +23,18 @@ def test_temporal_split_is_positional():
     assert temporal_split(pd.DataFrame({"a": range(100)})) == 80
 
 
+def test_saved_triage_classifier_loads_from_classify_module(tmp_path):
+    import joblib
+
+    path = tmp_path / "clf.joblib"
+    joblib.dump(TriageClassifier(), path)
+
+    clf = joblib.load(path)
+
+    assert type(clf) is TriageClassifier
+    assert type(clf).__module__ == "complaintiq.classify"
+
+
 def test_cascade_endpoints_and_cost_monotonic(synth_df):
     df = synth_df[synth_df.narrative.fillna("").str.len() > 0].sort_values("date_received").reset_index(drop=True)
     texts = df.narrative.tolist()

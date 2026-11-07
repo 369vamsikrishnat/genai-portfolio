@@ -19,6 +19,68 @@ from .data import load_complaints
 from .embed import get_embedder
 from .retrieve import BM25
 
+def _encode_resumable(emb, texts, out_dir, chunk_size=2000):
+    """Encode texts in durable chunks and resume interrupted runs."""
+    import os
+
+    out_dir = Path(out_dir)
+    progress_path = out_dir / "embedding_progress.json"
+    partial_path = out_dir / "vectors.partial.npy"
+
+    fingerprint = hashlib.sha256()
+    fingerprint.update(emb.name.encode("utf-8"))
+    for text in texts:
+        fingerprint.update(text.encode("utf-8"))
+        fingerprint.update(b"\0")
+    fingerprint = fingerprint.hexdigest()
+
+    start = 0
+    if progress_path.exists() and partial_path.exists():
+        progress = json.loads(progress_path.read_text(encoding="utf-8"))
+        if (
+            progress.get("fingerprint") != fingerprint
+            or progress.get("total") != len(texts)
+            or progress.get("dim") != emb.dim
+            or progress.get("chunk_size") != chunk_size
+        ):
+            raise ValueError("Saved embedding progress does not match this build.")
+
+        start = progress["next_index"]
+        vectors = np.load(partial_path, mmap_mode="r+")
+    else:
+        vectors = np.lib.format.open_memmap(
+            partial_path,
+            mode="w+",
+            dtype=np.float32,
+            shape=(len(texts), emb.dim),
+        )
+
+    try:
+        for i in range(start, len(texts), chunk_size):
+            end = min(i + chunk_size, len(texts))
+            vectors[i:end] = emb.encode(texts[i:end])
+            vectors.flush()
+
+            progress_path.write_text(
+                json.dumps({
+                    "fingerprint": fingerprint,
+                    "total": len(texts),
+                    "dim": emb.dim,
+                    "chunk_size": chunk_size,
+                    "next_index": end,
+                }, indent=2),
+                encoding="utf-8",
+            )
+            print(f"Embedding progress: {end}/{len(texts)}", flush=True)
+    finally:
+        vectors.flush()
+
+    del vectors
+    os.replace(partial_path, out_dir / "vectors.npy")
+    progress_path.unlink(missing_ok=True)
+
+    return np.load(out_dir / "vectors.npy", mmap_mode="r")
+
 META_COLS = [
     "complaint_id", "date_received", "product", "issue",
     "company", "company_response", "narrative",
@@ -137,7 +199,7 @@ def build(
 
     emb = get_embedder(embedder_name)
     t0 = time.perf_counter()
-    X = emb.encode(texts)
+    X =  _encode_resumable(emb, texts, out)
     embed_s = time.perf_counter() - t0
 
     y = df[label_col].to_numpy()
@@ -152,7 +214,6 @@ def build(
         bm25_s = time.perf_counter() - t0
         joblib.dump(bm25, out / "bm25.joblib")
 
-    np.save(out / "vectors.npy", X)
     joblib.dump(clf, out / "clf.joblib")
     joblib.dump(df[META_COLS].assign(narrative=texts), out / "meta.joblib")
 

@@ -90,29 +90,162 @@ class OllamaClient:
 
 
 class GeminiClient:
-    """Gemini REST API (free tier works with an AI Studio key). Free-tier limits are tight and
-    change often: this client backs off on 429, but plan batch work around Ollama instead."""
+    """Gemini REST client with live Flash-model discovery and automatic failover."""
+
+    CATALOG_URL = "https://generativelanguage.googleapis.com/v1beta/models"
+    TRANSIENT_STATUSES = {429, 500, 502, 503, 504}
 
     def __init__(self, model: str, api_key: str):
         if not api_key:
             raise ValueError("set GEMINI_API_KEY (create one in Google AI Studio)")
-        self.name, self.model, self.key = f"gemini:{model}", model, api_key
+        self.name = f"gemini:{model}"
+        self.model = model
+        self.key = api_key
+        self.models_used: set[str] = set()
+        self.retry_wait = 5
+        self.max_wait = 60
+        self.max_retry_cycles = 4
+
+    def _discover_models(self) -> list[str]:
+        """Fetch models supported by this API key; keep Flash models only."""
+        models: list[str] = []
+        page_token = None
+
+        while True:
+            params = {"pageSize": 1000}
+            if page_token:
+                params["pageToken"] = page_token
+
+            response = requests.get(
+                self.CATALOG_URL,
+                headers={"x-goog-api-key": self.key},
+                params=params,
+                timeout=30,
+            )
+            response.raise_for_status()
+            payload = response.json()
+
+            for item in payload.get("models", []):
+                methods = item.get("supportedGenerationMethods", [])
+                name = item.get("name", "")
+                model_id = name.removeprefix("models/")
+                model_lower = model_id.lower()
+                excluded = ("tts", "image", "audio", "live")
+                if (
+                    "generateContent" in methods
+                    and "flash" in model_lower
+                    and not any(term in model_lower for term in excluded)
+                    and model_id
+                ):
+                    models.append(model_id)
+
+            page_token = payload.get("nextPageToken")
+            if not page_token:
+                break
+
+        # Try the configured model first, then other discovered Flash models.
+        ordered = []
+        if self.model in models:
+            ordered.append(self.model)
+        ordered.extend(sorted(m for m in set(models) if m not in ordered))
+        return ordered
 
     def generate(self, prompt: str, max_tokens: int = 256) -> LLMResponse:
-        t0 = time.perf_counter()
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
-        r = _post_with_retry(url, headers={"x-goog-api-key": self.key}, json={
-            "contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0, "maxOutputTokens": max_tokens}}).json()
-        try:
-            text = r["candidates"][0]["content"]["parts"][0]["text"].strip()
-        except (KeyError, IndexError):
-            text = ""
-        meta = r.get("usageMetadata", {})
-        u = Usage(meta.get("promptTokenCount", estimate_tokens(prompt)),
-                  meta.get("candidatesTokenCount", estimate_tokens(text)))
-        return LLMResponse(text, u, (time.perf_counter() - t0) * 1000)
+        started = time.perf_counter()
+        wait_seconds = self.retry_wait
+        last_error = None
 
+        for cycle in range(1, self.max_retry_cycles + 1):
+            try:
+                candidates = self._discover_models()
+            except requests.HTTPError as error:
+                status = error.response.status_code if error.response is not None else None
+                if status not in self.TRANSIENT_STATUSES:
+                    raise RuntimeError(
+                        f"Gemini model discovery failed permanently (HTTP {status}). "
+                        "Check API key, permissions, and API access."
+                    ) from error
+                last_error = error
+                candidates = []
+            except requests.RequestException as error:
+                last_error = error
+                candidates = []
+
+            if candidates:
+                for model_id in candidates:
+                    url = f"{self.CATALOG_URL}/{model_id}:generateContent"
+                    try:
+                        response = requests.post(
+                            url,
+                            headers={"x-goog-api-key": self.key},
+                            json={
+                                "contents": [{"parts": [{"text": prompt}]}],
+                                "generationConfig": {
+                                    "temperature": 0,
+                                    "maxOutputTokens": max_tokens,
+                                },
+                            },
+                            timeout=120,
+                        )
+                        response.raise_for_status()
+                        payload = response.json()
+                        parts = (
+                            payload.get("candidates", [{}])[0]
+                            .get("content", {})
+                            .get("parts", [])
+                        )
+                        text = "".join(
+                            part.get("text", "") for part in parts
+                        ).strip()
+
+                        if not text:
+                            last_error = RuntimeError(
+                                f"{model_id} returned an empty response"
+                            )
+                            continue
+
+                        usage = payload.get("usageMetadata", {})
+                        tokens = Usage(
+                            usage.get("promptTokenCount", estimate_tokens(prompt)),
+                            usage.get("candidatesTokenCount", estimate_tokens(text)),
+                        )
+                        self.model = model_id
+                        self.name = f"gemini:{model_id}"
+                        self.models_used.add(model_id)
+                        return LLMResponse(
+                            text,
+                            tokens,
+                            (time.perf_counter() - started) * 1000,
+                        )
+
+                    except requests.HTTPError as error:
+                        status = (
+                            error.response.status_code
+                            if error.response is not None
+                            else None
+                        )
+                        if status in (401, 403):
+                            raise RuntimeError(
+                                f"Gemini request rejected (HTTP {status}). "
+                                "Check the API key and permissions."
+                            ) from error
+                        last_error = error
+                    except (requests.RequestException, ValueError, KeyError, IndexError) as error:
+                        last_error = error
+
+            if cycle < self.max_retry_cycles:
+                time.sleep(wait_seconds)
+                wait_seconds = min(wait_seconds * 2, self.max_wait)
+
+        detail = (
+            f"{type(last_error).__name__}: {last_error}"
+            if last_error is not None
+            else "no usable Flash models were returned"
+        )
+        raise RuntimeError(
+            f"Gemini failed after {self.max_retry_cycles} discovery/failover cycles; "
+            f"last error: {detail}. Completed evaluation batches remain checkpointed."
+        ) from last_error
 
 def get_llm(settings, truth: dict[str, str] | None = None):
     p = settings.llm_provider

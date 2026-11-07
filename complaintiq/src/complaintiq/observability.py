@@ -6,13 +6,16 @@ import logging
 import threading
 import time
 from collections import defaultdict, deque
+from datetime import datetime, timezone
 
 BUCKETS = (0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10)
 
 
 class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
-        d = {"ts": self.formatTime(record), "level": record.levelname, "logger": record.name,
+        timestamp = datetime.fromtimestamp(record.created, timezone.utc)
+        d = {"ts": timestamp.isoformat(timespec="milliseconds").replace("+00:00", "Z"),
+             "level": record.levelname, "logger": record.name,
              "msg": record.getMessage()}
         d.update(getattr(record, "extra_fields", {}))
         return json.dumps(d)

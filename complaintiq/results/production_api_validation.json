@@ -1,0 +1,147 @@
+{
+  "report": "ComplaintIQ production API, audit trail, and observability validation",
+  "validated_at": "2026-10-30",
+  "validation_type": "local real-artifact FastAPI TestClient integration; not a production security or load certification",
+  "artifact": {
+    "path": "artifacts/complaintiq",
+    "source_type": "real CFPB",
+    "rows": 67452,
+    "sampled_rows_before_template_deduplication": 100000,
+    "template_deduplicated": true,
+    "training_rows": 53961,
+    "embedding": "hashing",
+    "dimensions": 384,
+    "built_at": "2026-10-30T15:30:51",
+    "manifest_artifact_version": null,
+    "audit_artifact_version_fallback": "built_at",
+    "training_runtime_versions_in_manifest": null,
+    "load_warnings": [
+      "scikit-learn LogisticRegression and CountVectorizer artifacts report version 1.9.1; the current runtime is 1.9.0"
+    ]
+  },
+  "endpoint_coverage": [
+    {
+      "method": "GET",
+      "path": "/health",
+      "observed": "200 with and without model artifacts",
+      "notes": "Liveness only; it does not assert model readiness."
+    },
+    {
+      "method": "POST",
+      "path": "/triage",
+      "observed": "200 real-artifact classification and risk flags; 401 missing API key; 422 invalid input; 503 artifacts unavailable; 500 simulated inference failure",
+      "notes": "Prompt-injection text is marked for human review and queued."
+    },
+    {
+      "method": "POST",
+      "path": "/draft",
+      "observed": "200 cited evidence draft; 200 explicit refusal for unrelated evidence; 422 blank input"
+    },
+    {
+      "method": "GET",
+      "path": "/queue",
+      "observed": "200 with pending decisions",
+      "notes": "Retrieved complaint narrative snippets are omitted from public queue payloads."
+    },
+    {
+      "method": "POST",
+      "path": "/queue/{queue_id}/approve",
+      "observed": "200; approval is recorded with reviewer and request ID"
+    },
+    {
+      "method": "POST",
+      "path": "/queue/{queue_id}/reject",
+      "observed": "200; rejection is recorded"
+    },
+    {
+      "method": "POST",
+      "path": "/decisions/{decision_id}/send",
+      "observed": "200 after approval; 403 for rejected/unapproved decisions"
+    },
+    {
+      "method": "GET",
+      "path": "/metrics",
+      "observed": "200 with and without model artifacts",
+      "notes": "Exports HTTP request counts/statuses/latency and service triage/draft/error counters."
+    }
+  ],
+  "workflow": {
+    "classification": "Completed using the existing real trained artifact; output confidence and product label validated.",
+    "risk_flags": "Unauthorized-transfer test input triggered identity_theft_fraud.",
+    "retrieval": "Real artifact retrieval returned precedent IDs for a related safe test input.",
+    "drafting": "Evidence template cited all returned precedent IDs; no retrieved narrative snippets appeared in response or audit payload.",
+    "insufficient_evidence": {
+      "query": "Unrelated balcony-gardening request",
+      "dense_similarity_max": 0.2182,
+      "lexical_rerank_max": 0.0882,
+      "configured_lexical_minimum": 0.1,
+      "outcome": "refused"
+    },
+    "heldout_gate_check": {
+      "sample_size": 150,
+      "seed": 42,
+      "source": "strictly later, template-deduplicated real CFPB complaints; training-only retrieval index",
+      "lexical_rerank_minimum_observed": 0.1198,
+      "queries_below_0_1": 0,
+      "interpretation": "Small automated threshold sanity check; not human relevance evaluation or proof of retrieval quality."
+    },
+    "approval_gate": "Draft send denied before approval; approved draft sent; rejected draft send returned 403."
+  },
+  "audit": {
+    "validated_fields": [
+      "request ID",
+      "UTC timestamp",
+      "classifier/model identifier",
+      "artifact version identifier",
+      "prompt version",
+      "hashed input",
+      "decision and status",
+      "citation/evidence complaint IDs",
+      "reviewer and review action",
+      "error type without exception message"
+    ],
+    "privacy": "Request narratives are not stored in audit payloads; draft and queue payloads omit retrieved narrative snippets. Input validation responses and access logs do not echo request bodies.",
+    "legacy_database_migration_tested": true
+  },
+  "observability": {
+    "structured_logs": [
+      "UTC-formatted timestamp",
+      "level",
+      "request ID",
+      "HTTP method and route template",
+      "status",
+      "duration",
+      "error type when a server error occurs"
+    ],
+    "http_metrics": [
+      "ciq_http_requests_total",
+      "ciq_http_request_seconds"
+    ],
+    "service_metrics": [
+      "ciq_triage_total",
+      "ciq_triage_errors_total",
+      "ciq_triage_seconds",
+      "ciq_draft_total",
+      "ciq_draft_errors_total",
+      "ciq_draft_seconds"
+    ],
+    "request_body_logged": false
+  },
+  "limitations": [
+    "The current checked-in artifact manifest has no explicit artifact ID or training-library versions; audit uses built_at as its artifact version fallback. New artifact builds now record an artifact version and Python/NumPy/scikit-learn versions.",
+    "Loading the saved scikit-learn objects emitted a 1.9.1 versus 1.9.0 compatibility warning. Requests completed, but this warning remains a deployment reproducibility concern.",
+    "TestClient emitted a Starlette deprecation warning about httpx integration.",
+    "No concurrency/load, deployment, transport/TLS, secret-rotation, authorization-policy, or regulatory-compliance certification was performed.",
+    "The /metrics route is currently public and the health endpoint is liveness-only; deployers should account for this in their network/access-control configuration."
+  ],
+  "tests": {
+    "focused_command": "pytest tests/test_production_api.py tests/test_audit_draft.py tests/test_service_e2e.py tests/test_draft_evaluation.py -q",
+    "status": "19 passed after the final model/artifact-version changes. After the UTC log-format change, the real-artifact end-to-end API test passed again (1 passed). The API/audit subset also passed after the model-version assertion (13 passed).",
+    "warnings": [
+      "scikit-learn artifacts loaded with a 1.9.1-versus-1.9.0 compatibility warning",
+      "Starlette TestClient emitted an httpx deprecation warning"
+    ],
+    "ruff": "passed",
+    "git_diff_check": "passed"
+  }
+}

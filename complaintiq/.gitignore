@@ -9,3 +9,5 @@ artifacts/*
 !artifacts/.gitkeep
 *.db
 .env
+docs/complaints.csv.zip
+test_output.txt

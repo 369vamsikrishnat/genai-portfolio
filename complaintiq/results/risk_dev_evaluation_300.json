@@ -1,0 +1,82 @@
+{
+  "n_labelled": 300,
+  "positives": 55,
+  "precision": 0.27,
+  "recall": 1.0,
+  "f1": 0.425,
+  "accuracy": 0.503,
+  "tp": 55,
+  "fp": 149,
+  "fn": 0,
+  "per_rule": {
+    "legal_threat": {
+      "support": 24,
+      "precision": 0.333,
+      "recall": 0.145,
+      "f1": 0.203
+    },
+    "regulator_mention": {
+      "support": 35,
+      "precision": 0.371,
+      "recall": 0.236,
+      "f1": 0.289
+    },
+    "identity_theft_fraud": {
+      "support": 92,
+      "precision": 0.511,
+      "recall": 0.855,
+      "f1": 0.639
+    },
+    "foreclosure_housing": {
+      "support": 1,
+      "precision": 1.0,
+      "recall": 0.018,
+      "f1": 0.036
+    },
+    "vulnerable_consumer": {
+      "support": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "discrimination": {
+      "support": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "credit_reporting_violation": {
+      "support": 138,
+      "precision": 0.203,
+      "recall": 0.509,
+      "f1": 0.29
+    },
+    "debt_validation": {
+      "support": 20,
+      "precision": 0.15,
+      "recall": 0.055,
+      "f1": 0.08
+    }
+  },
+  "severity": {
+    "high": {
+      "labelled": 0,
+      "risk_positives": 0,
+      "rule_flagged": 0,
+      "rule_recall": null
+    },
+    "medium": {
+      "labelled": 0,
+      "risk_positives": 0,
+      "rule_flagged": 0,
+      "rule_recall": null
+    },
+    "low": {
+      "labelled": 0,
+      "risk_positives": 0,
+      "rule_flagged": 0,
+      "rule_recall": null
+    }
+  },
+  "evaluation_note": "Rule metrics are measured only on rows with hand-entered risk_flag labels."
+}

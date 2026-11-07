@@ -46,8 +46,8 @@ class Settings:
             rate_limit_per_min=int(e("CIQ_RATE_LIMIT", "60")),
             llm_threshold=float(e("CIQ_LLM_THRESHOLD", "0.70")),
             min_dense_score=float(e("CIQ_MIN_DENSE_SCORE", "0.20")),
-            # Placeholder list prices. CHECK the provider's current pricing page and override.
-            price_in_per_m=float(e("CIQ_PRICE_IN_PER_M", "0.75")),
-            price_out_per_m=float(e("CIQ_PRICE_OUT_PER_M", "3.75")),
+            # Gemini 3.1 Flash-Lite Standard paid-tier list prices (USD per 1M tokens).
+            price_in_per_m=float(e("CIQ_PRICE_IN_PER_M", "0.25")),
+            price_out_per_m=float(e("CIQ_PRICE_OUT_PER_M", "1.50")),
             max_chars=int(e("CIQ_MAX_CHARS", "2000")),
         )

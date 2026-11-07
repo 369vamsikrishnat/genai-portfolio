@@ -1,20 +1,47 @@
 services:
   api:
-    build: .
+    build:
+      context: .
+      args:
+        EXTRAS: ${CIQ_DOCKER_EXTRAS:-data,serve}
     ports: ["8000:8000"]
     environment:
       CIQ_APP: api
       CIQ_LLM: ${CIQ_LLM:-mock}
+      CIQ_EMBEDDER: ${CIQ_EMBEDDER:-hashing}
+      CIQ_RERANKER: ${CIQ_RERANKER:-lexical}
+      CIQ_OLLAMA_URL: ${CIQ_OLLAMA_URL:-http://localhost:11434}
+      CIQ_OLLAMA_MODEL: ${CIQ_OLLAMA_MODEL:-qwen2.5:7b}
+      CIQ_GEMINI_MODEL: ${CIQ_GEMINI_MODEL:-gemini-flash-latest}
       CIQ_API_KEY: ${CIQ_API_KEY:-}
       CIQ_RATE_LIMIT: ${CIQ_RATE_LIMIT:-60}
+      CIQ_LLM_THRESHOLD: ${CIQ_LLM_THRESHOLD:-0.70}
+      CIQ_MIN_DENSE_SCORE: ${CIQ_MIN_DENSE_SCORE:-0.20}
+      CIQ_MAX_CHARS: ${CIQ_MAX_CHARS:-2000}
+      CIQ_PRICE_IN_PER_M: ${CIQ_PRICE_IN_PER_M:-0.75}
+      CIQ_PRICE_OUT_PER_M: ${CIQ_PRICE_OUT_PER_M:-3.75}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
     volumes: ["artifacts:/app/artifacts"]
   ui:
-    build: .
+    build:
+      context: .
+      args:
+        EXTRAS: ${CIQ_DOCKER_EXTRAS:-data,serve}
     ports: ["7860:7860"]
     environment:
       CIQ_APP: ui
       CIQ_LLM: ${CIQ_LLM:-mock}
+      CIQ_EMBEDDER: ${CIQ_EMBEDDER:-hashing}
+      CIQ_RERANKER: ${CIQ_RERANKER:-lexical}
+      CIQ_OLLAMA_URL: ${CIQ_OLLAMA_URL:-http://localhost:11434}
+      CIQ_OLLAMA_MODEL: ${CIQ_OLLAMA_MODEL:-qwen2.5:7b}
+      CIQ_GEMINI_MODEL: ${CIQ_GEMINI_MODEL:-gemini-flash-latest}
+      CIQ_LLM_THRESHOLD: ${CIQ_LLM_THRESHOLD:-0.70}
+      CIQ_MIN_DENSE_SCORE: ${CIQ_MIN_DENSE_SCORE:-0.20}
+      CIQ_MAX_CHARS: ${CIQ_MAX_CHARS:-2000}
+      CIQ_PRICE_IN_PER_M: ${CIQ_PRICE_IN_PER_M:-0.75}
+      CIQ_PRICE_OUT_PER_M: ${CIQ_PRICE_OUT_PER_M:-3.75}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
     volumes: ["artifacts:/app/artifacts"]
 volumes:
   artifacts: {}

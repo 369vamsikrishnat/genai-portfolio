@@ -1,7 +1,15 @@
 import pandas as pd
 
 from complaintiq.risk import risk_flags
-from complaintiq.spikes import cluster_embeddings, detect_spikes, top_terms, write_brief
+from complaintiq.spikes import (
+    cluster_embeddings,
+    detect_spikes,
+    detect_weekly_spikes,
+    evaluate_historical_spikes,
+    top_terms,
+    weekly_counts_wide,
+    write_brief,
+)
 from complaintiq.synth import SPIKE, generate
 
 
@@ -54,5 +62,62 @@ def test_clusters_and_terms(synth_df):
 
 
 def test_risk_flags():
-    assert "legal_threat" in risk_flags("I will contact my attorney")
+    assert "legal_threat" in risk_flags("I will pursue legal action")
     assert risk_flags("my statement was late") == []
+
+
+def _weekly_counts(values, group=("A", "Product", "Issue")):
+    rows = []
+    start = pd.Timestamp("2025-01-06")
+    for week, count in enumerate(values):
+        if count:
+            rows.append({
+                "company": group[0], "product": group[1], "issue": group[2],
+                "week": start + pd.Timedelta(weeks=week), "n": count,
+            })
+    return pd.DataFrame(rows)
+
+
+def test_spike_requires_minimum_historical_support():
+    counts = _weekly_counts([1] * 8 + [20])
+    wide = weekly_counts_wide(counts, ("company", "product", "issue"))
+
+    alerts = detect_weekly_spikes(
+        wide, ("company", "product", "issue"), min_count=10, min_baseline_count=20,
+    )
+
+    assert alerts.empty
+
+
+def test_historical_alerts_are_invariant_to_future_groups_and_weeks():
+    base = _weekly_counts([3] * 8 + [25])
+    future = _weekly_counts([0] * 11 + [50], ("Future Co", "Future product", "Future issue"))
+    all_counts = pd.concat([base, future], ignore_index=True)
+    keys = ("company", "product", "issue")
+
+    base_alerts = detect_weekly_spikes(weekly_counts_wide(base, keys), keys)
+    all_alerts = detect_weekly_spikes(weekly_counts_wide(all_counts, keys), keys)
+    base_week = base["week"].max()
+    before = all_alerts[all_alerts["week"] <= base_week]
+
+    assert len(base_alerts) == 1
+    fields = ["company", "product", "issue", "week", "count", "z", "p_value", "alpha"]
+    assert before[fields].reset_index(drop=True).equals(
+        base_alerts[fields].reset_index(drop=True)
+    )
+
+
+def test_historical_spike_report_distinguishes_unlabeled_alerts():
+    counts = _weekly_counts([3] * 8 + [25])
+
+    report = evaluate_historical_spikes(
+        counts, keys=("company", "product", "issue"),
+    )
+
+    assert report["evaluation_type"] == "chronological_unlabeled_backtest"
+    assert report["alert_summary"]["alerts"] == 1
+    assert report["alert_summary"]["severity_counts"]["high"] == 1
+    assert report["alert_summary"]["false_alert_count"] is None
+    assert report["alert_summary"]["detection_latency_weeks"] is None
+    assert report["ground_truth"]["available"] is False
+    assert report["alerts"][0]["baseline_count"] == 24

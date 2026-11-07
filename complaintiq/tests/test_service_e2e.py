@@ -18,10 +18,18 @@ def svc(settings, synth_df, tmp_path):
 def test_manifest_has_temporal_holdout_metric(svc):
     m = svc.art.manifest
     assert 0 < m["n_train"] < m["n"] and m["classifier_macro_f1_test"] > 0.5
+    assert m["artifact_version"].startswith("ciq-")
+    assert {"python", "numpy", "scikit_learn"} <= set(m["runtime_versions"])
+    split = m["temporal_split"]
+    assert split["strategy"] == "chronological_80_20"
+    assert split["train_rows"] == m["n_train"]
+    assert split["test_rows"] == m["n"] - m["n_train"]
+    assert split["train_end"] <= split["test_start"]
+    assert m["data_source"]
 
 
 def test_triage_routes_and_flags(svc):
-    r = svc.triage("Unauthorized charge on my card. I did not make these transactions. I will contact my attorney.")
+    r = svc.triage("Unauthorized charge on my card. I did not make these transactions. I will pursue legal action if this is not resolved.")
     assert r["product"] == "Credit card" and r["team"] == "Cards Disputes"
     assert "legal_threat" in r["risk_flags"] and r["decision_id"] > 0
 
@@ -39,3 +47,15 @@ def test_draft_flow_zero_unapproved_sends(svc):
     svc.approve(d["queue_id"], "reviewer-1", "looks good")
     svc.send(d["decision_id"])
     assert svc.audit.counts().get("sent") == 1
+
+def test_identity_theft_fraud_requires_human_review(svc):
+    text = (
+        "I noticed an unauthorized transfer of 25000 from my savings account. "
+        "I did not initiate or approve this transaction. "
+        "I contacted the bank and requested an investigation."
+    )
+    r = svc.triage(text)
+    assert "identity_theft_fraud" in r["risk_flags"]
+    assert r["needs_review"] is True
+    assert "identity_theft_fraud" in " ".join(r["review_reasons"])
+    assert any(p["decision_id"] == r["decision_id"] for p in svc.queue())

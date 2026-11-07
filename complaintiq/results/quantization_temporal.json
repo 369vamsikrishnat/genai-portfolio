@@ -1,0 +1,51 @@
+{
+  "n": 25000,
+  "dim": 384,
+  "memory_mb": {
+    "float32": 36.62,
+    "int8": 9.16,
+    "binary": 1.14,
+    "binary+int8_rescore": 10.3
+  },
+  "float32": {
+    "recall@k": 1.0,
+    "latency_ms": {
+      "p50": 6.125,
+      "p95": 89.278,
+      "p99": 605.797
+    },
+    "build_s": 0.0
+  },
+  "int8": {
+    "recall@k": 0.982,
+    "latency_ms": {
+      "p50": 79.384,
+      "p95": 146.914,
+      "p99": 176.985
+    },
+    "build_s": 0.231
+  },
+  "binary": {
+    "recall@k": 0.416,
+    "latency_ms": {
+      "p50": 14.326,
+      "p95": 23.073,
+      "p99": 30.865
+    },
+    "build_s": 0.018
+  },
+  "binary+int8_rescore": {
+    "recall@k": 0.858,
+    "latency_ms": {
+      "p50": 11.427,
+      "p95": 13.688,
+      "p99": 20.479
+    },
+    "build_s": 0.249
+  },
+  "query_source": "temporal holdout",
+  "train_cutoff": "2025-09-23",
+  "holdout_start": "2025-09-24",
+  "n_queries": 50,
+  "artifact_version": "ciq-2026-11-05T23:08:14-329940-0"
+}
