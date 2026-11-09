@@ -98,14 +98,15 @@ def test_refuses_when_no_precedent():
 
 
 def test_cited_draft_ok_and_citations_valid():
-    d = make_drafter(MockLLM()).draft("unauthorized charge on my credit card")
+    narrative = "unauthorized charge on my credit card"
+    d = make_drafter(MockLLM()).draft(narrative)
     assert d.status == "ok" and d.citations and set(d.citations) <= {11, 12, 13, 14}
     assert set(d.citations) == {p["id"] for p in d.precedents}
     assert "historical CFPB records" in d.text
     assert "do not establish the facts or outcome" in d.text
     assert "regulatory deadline" not in d.text
     assert "opened a review" not in d.text
-    assert validate_evidence_draft(d.text, d.precedents)
+    assert validate_evidence_draft(d.text, d.precedents, narrative)
 
 
 class UnsupportedDraft:
@@ -116,10 +117,11 @@ class UnsupportedDraft:
 
 
 def test_final_draft_does_not_use_unverified_model_prose():
-    d = make_drafter(UnsupportedDraft()).draft("unauthorized charge on my credit card")
+    narrative = "unauthorized charge on my credit card"
+    d = make_drafter(UnsupportedDraft()).draft(narrative)
     assert d.status == "ok"
     assert "Refund approved" not in d.text
-    assert validate_evidence_draft(d.text, d.precedents)
+    assert validate_evidence_draft(d.text, d.precedents, narrative)
 
 
 def test_rendered_evidence_facts_are_cited_and_historical():
@@ -152,3 +154,21 @@ def test_rate_limiter_and_metrics():
     m.observe("lat_seconds", 0.03)
     out = m.render()
     assert 'req_total{path="/x"} 1.0' in out and "lat_seconds_count 1" in out and 'le="+Inf"' in out
+
+
+
+def test_complaint_specific_summary_identifies_mortgage_escrow():
+    from complaintiq.draft import summarize_reported_concerns
+
+    concerns = summarize_reported_concerns(
+        "My mortgage monthly payment increased because of an escrow calculation error."
+    )
+    assert "a change or increase in your monthly payment" in concerns
+    assert "the calculation and explanation of your escrow account" in concerns
+
+
+def test_complaint_specific_summary_uses_neutral_fallback():
+    from complaintiq.draft import summarize_reported_concerns
+
+    concerns = summarize_reported_concerns("I need help with my account.")
+    assert concerns == ["the issue described in your complaint"]

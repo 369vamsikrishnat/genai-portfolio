@@ -38,8 +38,17 @@ RULES: dict[str, list[str]] = {
         r"\b(?:account|loan|credit card|collection)\b.{0,100}\bopened\b.{0,100}\b(?:in my name|without my knowledge|without my consent)\b",
         r"\b(?:someone|another person|third party)\b.{0,100}\b(?:opened|created|took out)\b.{0,100}\b(?:account|loan|card)\b",
         r"\b(?:fraudulent|unauthorized)\s+(?:withdrawal|transfer|charge|transaction|purchase)\b",
+        r"\b(?:transactions?|activity|charges?|transfers?|withdrawals?|purchases?)\b"
+        r".{0,120}\b(?:i did not authorize|i didn't authorize|i never authorized|"
+        r"not authorized by me|without my authorization)\b",
         r"\b(?:unauthorized|fraudulent)\s+(?:charge|transaction|withdrawal|transfer)\b"
         r".{0,100}\b(?:i did not make|i did not authorize|not made or authorized by me)\b",
+        r"\b(?:transactions?|activity|charges?|transfers?)\b"
+        r".{0,100}\b(?:may have been|might have been|could have been|possibly)\b"
+        r".{0,80}\b(?:processed|made|initiated|completed|authorized)\b"
+        r".{0,80}\bwithout my authorization\b",
+        r"\b(?:without my authorization|without my consent)\b"
+        r".{0,100}\b(?:transactions?|activity|charges?|transfers?|withdrawals?)\b",
         r"\b(?:account takeover|took over my account|stole my funds|stole my money)\b",
         r"\b(?:i did not make|i did not authorize|not made or authorized by me)"
         r".{0,100}\b(?:charge|transaction|withdrawal|transfer|purchase)\b",

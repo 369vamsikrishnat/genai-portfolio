@@ -53,7 +53,8 @@ class MockLLM:
     def generate(self, prompt: str, max_tokens: int = 256) -> LLMResponse:
         t0 = time.perf_counter()
         if "TASK: CLASSIFY" in prompt:
-            labels = re.findall(r"^- (.+)$", prompt.split("LABELS:")[1].split("COMPLAINT:")[0], re.M)
+            label_section = prompt.split("LABELS:", 1)[1].split("PRODUCT SELECTION GUIDANCE:", 1)[0]
+            labels = re.findall(r"^- (.+)$", label_section, re.M)
             text = prompt.split("<complaint>")[1].split("</complaint>")[0].strip()
             gold = self.truth.get(text)
             if gold in labels and self.rng.random() < self.accuracy:

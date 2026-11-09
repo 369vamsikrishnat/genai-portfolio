@@ -17,6 +17,18 @@ def test_prompt_marks_untrusted():
     assert "untrusted" in p and "<complaint>" in p
 
 
+def test_prompt_distinguishes_deposit_accounts_from_mortgages():
+    labels = ["Checking or savings account", "Mortgage"]
+    prompt = classification_prompt("Unexpected bank account balance adjustments", labels)
+
+    assert "Checking or savings account" in prompt
+    assert "deposits" in prompt.lower()
+    assert "Mortgage" in prompt
+    assert "home loans" in prompt.lower()
+    assert "mortgage payments" in prompt.lower()
+    assert "untrusted" in prompt.lower()
+
+
 def test_temporal_split_is_positional():
     import pandas as pd
 

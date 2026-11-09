@@ -8,7 +8,7 @@ import pandas as pd
 
 from .retrieve import HybridRetriever
 
-PROMPT_VERSION = "draft-v2-evidence-template"
+PROMPT_VERSION = "draft-v3-complaint-specific-template"
 REFUSAL = "NOT_ENOUGH_PRECEDENT: insufficient retrieved evidence to prepare a response."
 MIN_LEXICAL_RERANK_SCORE = 0.1
 CITE_RE = re.compile(r"\[CFPB-(\d+)\]")
@@ -55,8 +55,40 @@ def build_prompt(narrative: str, precedents: list[dict]) -> str:
             f"PRECEDENTS:\n{pre}\nUNTRUSTED COMPLAINT DATA:\n{narrative}\nREPLY:")
 
 
-def render_evidence_draft(precedents: list[dict]) -> str:
-    """Render a response using only exact fields from retrieved historical records."""
+def summarize_reported_concerns(narrative: str) -> list[str]:
+    """Extract conservative complaint topics from the consumer's description."""
+    text = sanitize(narrative, 1500).lower()
+    rules = [
+        (r"unauthori[sz]ed|unrecognized|not recognize|without my permission|fraud|"
+         r"did not authorize|didn't authorize|never authorized|not authorized by me|"
+         r"without my authorization",
+         "transactions you do not recognize or did not authorize"),
+        (r"dispute|disputed|reject(?:ed|ion)|denied",
+         "the handling and outcome of your transaction dispute"),
+        (r"interest|late payment fee|late fee|penalt(?:y|ies)",
+         "interest, late fees, or other charges added to the account"),
+        (r"mortgage payment|monthly payment|payment increased|payment increase",
+         "a change or increase in your monthly payment"),
+        (r"escrow", "the calculation and explanation of your escrow account"),
+        (r"foreclos", "the mortgage servicing or foreclosure concerns you described"),
+        (r"balance|withdrawal|transfer|deposit",
+         "changes to your account balance or account transactions"),
+        (r"contact(?:ed|ing)?|call(?:ed|s)?|customer support|response",
+         "the assistance and follow-up you have received"),
+        (r"credit report|credit score|reporting error",
+         "the accuracy of information in your credit report"),
+        (r"collect(?:ion|or)|debt not mine|debt validation",
+         "the debt collection activity you described"),
+    ]
+    concerns = []
+    for pattern, description in rules:
+        if re.search(pattern, text) and description not in concerns:
+            concerns.append(description)
+    return concerns[:5] or ["the issue described in your complaint"]
+
+
+def render_evidence_draft(precedents: list[dict], narrative: str = "") -> str:
+    """Render reported concerns alongside exact facts from historical records."""
     records = []
     for precedent in precedents:
         outcome = precedent["outcome"]
@@ -66,19 +98,30 @@ def render_evidence_draft(precedents: list[dict]) -> str:
             f"- [CFPB-{precedent['id']}] Reported product: {precedent['product']}; "
             f"reported issue: {precedent['issue']}; published company response category: {outcome}."
         )
+
+    concerns = summarize_reported_concerns(narrative)
+    concern_text = (
+        "Based on your description, the concerns you reported include: "
+        + "; ".join(concerns)
+        + ". This summary reflects your account and has not been independently verified.\n\n"
+    )
     return (
-        "Thank you for sharing your concern. The retrieved historical CFPB records below are "
-        "provided only as context. Their reported categories and outcomes do not establish the facts "
-        "or outcome of your complaint.\n\n"
+        "Thank you for sharing your concern.\n\n"
+        + concern_text
+        + "The retrieved historical CFPB records below are provided only as context. "
+        "Their reported categories and outcomes do not establish the facts or outcome "
+        "of your complaint.\n\n"
         "Retrieved historical records:\n"
         + "\n".join(records)
         + "\n\nA human reviewer should assess your specific complaint before a substantive response is sent."
     )
 
 
-def validate_evidence_draft(text: str, precedents: list[dict]) -> bool:
-    """Check that the complete output is the evidence-only template for these records."""
-    return bool(precedents) and text == render_evidence_draft(precedents)
+def validate_evidence_draft(
+    text: str, precedents: list[dict], narrative: str = ""
+) -> bool:
+    """Validate the deterministic draft against its complaint and retrieved evidence."""
+    return bool(precedents) and text == render_evidence_draft(precedents, narrative)
 
 
 class Drafter:
@@ -114,9 +157,9 @@ class Drafter:
             return DraftResult("refused", REFUSAL, reasons=["insufficient lexical evidence"],
                                model="evidence-template")
         prec = self._precedents(hits)
-        text = render_evidence_draft(prec)
+        text = render_evidence_draft(prec, clean)
         cited = [int(c) for c in CITE_RE.findall(text)]
-        if not validate_evidence_draft(text, prec) or set(cited) != {p["id"] for p in prec}:
+        if not validate_evidence_draft(text, prec, clean) or set(cited) != {p["id"] for p in prec}:
             return DraftResult("needs_review", "", [], prec,
                                ["evidence draft validation failed"], "evidence-template")
         return DraftResult("ok", text, cited, prec, model="evidence-template")

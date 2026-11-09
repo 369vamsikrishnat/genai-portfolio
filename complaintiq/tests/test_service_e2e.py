@@ -59,3 +59,35 @@ def test_identity_theft_fraud_requires_human_review(svc):
     assert r["needs_review"] is True
     assert "identity_theft_fraud" in " ".join(r["review_reasons"])
     assert any(p["decision_id"] == r["decision_id"] for p in svc.queue())
+
+
+def test_classifier_llm_disagreement_requires_human_review(svc, monkeypatch):
+    from complaintiq.llm import LLMResponse, Usage
+
+    classifier_label = str(svc.labels[0])
+    llm_label = next(label for label in svc.labels if label != classifier_label)
+
+    monkeypatch.setattr(
+        svc.art.clf,
+        "predict_with_conf",
+        lambda X: ([classifier_label], [0.402]),
+    )
+
+    class FixedLLM:
+        name = "fixed-test-model"
+
+        def generate(self, prompt, max_tokens=256):
+            return LLMResponse(llm_label, Usage(10, 2), 1.0)
+
+    svc.llm = FixedLLM()
+    result = svc.triage("My bank has not resolved this account issue.")
+
+    assert result["confidence"] == 0.402
+    assert result["product"] == classifier_label
+    assert result["classifier_product"] == classifier_label
+    assert result["llm_product"] == llm_label
+    assert result["source"] == "classifier+llm"
+    assert any("low classifier confidence" in reason for reason in result["review_reasons"])
+    assert result["needs_review"] is True
+    assert any("disagree" in reason for reason in result["review_reasons"])
+    assert any(item["decision_id"] == result["decision_id"] for item in svc.queue())

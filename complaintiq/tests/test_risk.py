@@ -25,6 +25,19 @@ def test_risk_matches_explain_flags_without_changing_flag_api():
     assert risk_flags("my statement was late") == []
 
 
+def test_potentially_unauthorized_transactions_trigger_fraud_review():
+    text = (
+        "I am concerned that transactions may have been processed "
+        "without my authorization."
+    )
+
+    matches = risk_matches(text)
+
+    assert "identity_theft_fraud" in matches
+    assert any("without my authorization" in item for item in matches["identity_theft_fraud"])
+    assert risk_flags("I noticed an unexpected balance adjustment.") == []
+
+
 def test_score_rules_reports_overall_per_rule_and_severity_metrics(tmp_path):
     sheet = tmp_path / "labels.csv"
     pd.DataFrame([

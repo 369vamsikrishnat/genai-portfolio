@@ -65,7 +65,9 @@ def test_real_artifact_api_workflow_and_audit_privacy(real_service, settings):
         assert triage.json()["decision_id"] > 0
         assert triage.json()["product"] in real_service.labels
         assert 0.0 <= triage.json()["confidence"] <= 1.0
-        assert triage.json()["source"] in {"classifier", "llm"}
+        assert triage.json()["source"] in {"classifier", "classifier+llm"}
+        assert triage.json()["classifier_product"] == triage.json()["product"]
+        assert triage.json()["llm_product"] is None or triage.json()["llm_product"] in real_service.labels
         assert "identity_theft_fraud" in triage.json()["risk_flags"]
         assert SAFE_TEXT not in triage.text
         triage_audit = real_service.audit.get(triage.json()["decision_id"])

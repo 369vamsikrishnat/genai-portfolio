@@ -51,20 +51,21 @@ class Service:
             clean = sanitize(text, self.s.max_chars)
             x = self.art.embedder.encode([clean])
             pred, conf = self.art.clf.predict_with_conf(x)
-            label, confidence, source, cost, review = str(pred[0]), float(conf[0]), "classifier", 0.0, []
+            classifier_label = str(pred[0])
+            label, confidence, source, cost, review = classifier_label, float(conf[0]), "classifier", 0.0, []
+            llm_label = None
             if inj:
                 review.append("possible prompt injection")
             elif confidence < self.s.llm_threshold:
+                review.append("low classifier confidence requires human review")
                 r = self.llm.generate(classification_prompt(clean, self.labels), max_tokens=24)
                 cost = cost_usd(r.usage, self.s.price_in_per_m, self.s.price_out_per_m)
                 llm_label = parse_label(r.text, self.labels)
-                source = "llm"
+                source = "classifier+llm"
                 if llm_label is None:
                     review.append("LLM answer unparsable")
-                else:
-                    label = llm_label
-                    if llm_label != str(pred[0]) and confidence < 0.4:
-                        review.append("classifier and LLM disagree at low confidence")
+                elif llm_label != classifier_label:
+                    review.append("classifier and LLM disagree; human review required")
             flags = risk_flags(text)
             if "identity_theft_fraud" in flags:
                 review.append("identity_theft_fraud requires human review")
@@ -75,11 +76,12 @@ class Service:
             )
             self.metrics.inc("ciq_triage_errors_total", error_type=type(exc).__name__)
             raise
-        result = {"product": label, "confidence": round(confidence, 4), "source": source,
+        result = {"product": label, "classifier_product": classifier_label,
+                  "llm_product": llm_label, "confidence": round(confidence, 4), "source": source,
                   "team": ROUTING.get(label, DEFAULT_TEAM), "risk_flags": flags,
                   "needs_review": bool(review), "review_reasons": review, "est_cost_usd": cost}
         model = self.classifier_version
-        if source == "llm":
+        if source == "classifier+llm":
             model += f";llm={getattr(self.llm, 'name', 'unknown')}"
         did = self.audit.log_decision(
             "triage", text, result, model, "triage-v1",

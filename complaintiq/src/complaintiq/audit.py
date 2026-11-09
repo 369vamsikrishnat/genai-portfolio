@@ -16,7 +16,7 @@ class NotApproved(Exception):
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS decisions(
   id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT NOT NULL, kind TEXT NOT NULL,
-  input_hash TEXT NOT NULL, model TEXT, prompt_version TEXT, payload TEXT NOT NULL,
+  input_hash TEXT NOT NULL, input_text TEXT, model TEXT, prompt_version TEXT, payload TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'logged', request_id TEXT, artifact_version TEXT, error TEXT);
 CREATE TABLE IF NOT EXISTS review_queue(
   id INTEGER PRIMARY KEY AUTOINCREMENT, decision_id INTEGER NOT NULL REFERENCES decisions(id),
@@ -40,6 +40,7 @@ class AuditLog:
         self._mem = sqlite3.connect(":memory:", check_same_thread=False) if self.path == ":memory:" else None
         with self._conn() as c:
             c.executescript(SCHEMA)
+            self._add_column(c, "decisions", "input_text", "TEXT")
             self._add_column(c, "decisions", "request_id", "TEXT")
             self._add_column(c, "decisions", "artifact_version", "TEXT")
             self._add_column(c, "decisions", "error", "TEXT")
@@ -51,6 +52,45 @@ class AuditLog:
         columns = {row["name"] for row in c.execute(f"PRAGMA table_info({table})")}
         if column not in columns:
             c.execute(f"ALTER TABLE {table} ADD COLUMN {column} {kind}")
+
+    def reset_for_video(self) -> str:
+        """Back up and clear audit history once at fresh Streamlit startup."""
+        if self.path == ":memory:":
+            raise ValueError("Video reset requires a persistent audit database.")
+
+        db_path = Path(self.path)
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        stamp = datetime.now().strftime("%Y%m%dT%H%M%S")
+        backup_path = db_path.with_name(
+            f"{db_path.stem}.before_video_reset.{stamp}.bak"
+        )
+
+        with self._lock:
+            source = sqlite3.connect(self.path)
+            try:
+                backup = sqlite3.connect(str(backup_path))
+                try:
+                    source.backup(backup)
+                finally:
+                    backup.close()
+
+                source.execute("PRAGMA foreign_keys=ON")
+                source.execute("BEGIN IMMEDIATE")
+                source.execute("DELETE FROM audit_events")
+                source.execute("DELETE FROM review_queue")
+                source.execute("DELETE FROM decisions")
+                source.execute(
+                    "DELETE FROM sqlite_sequence "
+                    "WHERE name IN ('decisions', 'review_queue', 'audit_events')"
+                )
+                source.commit()
+            except Exception:
+                source.rollback()
+                raise
+            finally:
+                source.close()
+
+        return str(backup_path)
 
     @staticmethod
     def _now() -> str:
@@ -72,9 +112,9 @@ class AuditLog:
                      prompt_version: str = "", status: str = "logged", request_id: str | None = None,
                      artifact_version: str | None = None, error: str | None = None) -> int:
         cur = self._run(
-            "INSERT INTO decisions(ts,kind,input_hash,model,prompt_version,payload,status,request_id,"
-            "artifact_version,error) VALUES (?,?,?,?,?,?,?,?,?,?)",
-            (self._now(), kind, hash_text(input_text), model, prompt_version,
+            "INSERT INTO decisions(ts,kind,input_hash,input_text,model,prompt_version,payload,status,request_id,"
+            "artifact_version,error) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+            (self._now(), kind, hash_text(input_text), input_text, model, prompt_version,
              json.dumps(payload, default=str), status, request_id, artifact_version, error),
         )
         decision_id = int(cur.lastrowid)
@@ -125,6 +165,34 @@ class AuditLog:
                          "FROM review_queue q JOIN decisions d ON d.id=q.decision_id "
                          "WHERE q.status='pending' ORDER BY q.id").fetchall()
         return [{**dict(r), "payload": json.loads(r["payload"])} for r in rows]
+
+    def history(self, limit: int = 200) -> list[dict]:
+        """Return all decisions with their review state and original payload."""
+        rows = self._run(
+            "SELECT d.id AS decision_id, d.request_id, d.input_text, d.ts, d.kind, d.status, d.model, "
+            "d.prompt_version, d.artifact_version, d.payload, "
+            "q.id AS queue_id, q.reason, q.status AS review_status, "
+            "q.reviewer, q.note, q.created AS review_created, q.resolved "
+            "FROM decisions d LEFT JOIN review_queue q ON q.decision_id=d.id "
+            "ORDER BY d.id DESC LIMIT ?",
+            (max(1, int(limit)),),
+        ).fetchall()
+        return [
+            {**dict(row), "payload": json.loads(row["payload"])}
+            for row in rows
+        ]
+
+    def approved(self, limit: int = 100) -> list[dict]:
+        """Return approved review records with their original decision payload."""
+        rows = self._run(
+            "SELECT q.id AS queue_id, q.decision_id, q.reason, q.reviewer, q.note, "
+            "q.created, q.resolved, d.ts, d.kind, d.input_hash, d.model, "
+            "d.prompt_version, d.payload, d.status, d.artifact_version "
+            "FROM review_queue q JOIN decisions d ON d.id=q.decision_id "
+            "WHERE q.status='approved' ORDER BY q.resolved DESC, q.id DESC LIMIT ?",
+            (max(1, int(limit)),),
+        ).fetchall()
+        return [{**dict(row), "payload": json.loads(row["payload"])} for row in rows]
 
     def resolve(self, queue_id: int, reviewer: str, approve: bool, note: str = "",
                 request_id: str | None = None) -> None:
